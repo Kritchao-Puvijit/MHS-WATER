@@ -1,0 +1,1549 @@
+/* ==========================================================
+   Design tokens — Dark real-time monitoring theme
+   แรงบันดาลใจจาก m-water (MFU) ปรับสีให้เข้ากับ "สถานการณ์ฝน"
+   ========================================================== */
+:root {
+  --bg: #0B1220;
+  /* พื้นหลังหลัก เกือบดำอมน้ำเงิน */
+  --surface: #121B2E;
+  /* พื้นผิวการ์ด/panel */
+  --surface-2: #17233A;
+  /* พื้นผิวรอง (header row, hover) */
+  --border: #223047;
+  --text: #E7ECF3;
+  --text-muted: #8A97AC;
+
+  --accent: #38BDF8;
+  /* ฟ้า - โทนแบรนด์/ลิงก์/accent */
+  --accent-glow: rgba(56, 189, 248, 0.35);
+
+  /* สถานะปริมาณฝน 4 ระดับ */
+  --normal: #34D399;
+  /* เขียว - ปกติ */
+  --watch: #FBBF24;
+  /* เหลือง - เฝ้าระวัง */
+  --warning: #FB923C;
+  /* ส้ม - เตือนภัย */
+  --critical: #F87171;
+  /* แดง - วิกฤต */
+
+  --font-heading: 'Kanit', sans-serif;
+  --font-body: 'Sarabun', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.brand-text h1,
+.clock-value {
+  font-family: var(--font-heading);
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+}
+
+/* ============ Header ============ */
+.app-header {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.logo img {
+  display: block;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #0EA5E9);
+  color: #041018;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 22px var(--accent-glow);
+}
+
+.brand-text h1 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.brand-text p {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.header-clock {
+  text-align: right;
+}
+
+.clock-label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.clock-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.date-value {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ============ Main layout ============ */
+.app-main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  /* <--- เปลี่ยนตรงนี้ เช่น เพิ่มเป็น 28px หรือ 32px */
+}
+
+/* ============ Description =========== */
+.hero {
+  min-height: 20px;
+  border-radius: 24px;
+  padding: 30px 38px;
+  background: radial-gradient(circle at 80% 30%, #087bd466, transparent 25%), linear-gradient(120deg, #061a2e, #0c4f83);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+
+/* กัน text-wrap สั่นตอนความกว้างขยับ (เช่นนาฬิกาเปลี่ยนเลขทุกวินาที):
+   ฝั่งข้อความยอมหดได้เต็มที่ (min-width:0) ส่วนฝั่งนาฬิกาห้ามหด (flex-shrink:0)
+   ทำให้พื้นที่แบ่งกันนิ่ง ไม่ขยับไปมาระหว่างสองค่าจนตัดคำสลับบรรทัด */
+.hero>div:first-child {
+  min-width: 0;
+}
+
+.header-clock {
+  flex-shrink: 0;
+}
+
+/* ============ Status bar ============ */
+.status-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.status-pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-total {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.dot-normal {
+  background: var(--normal);
+}
+
+.dot-watch {
+  background: var(--watch);
+}
+
+.dot-warning {
+  background: var(--warning);
+}
+
+.dot-critical {
+  background: var(--critical);
+}
+
+.dot-critical-low {
+  background: #C084FC;
+}
+
+.dot-low {
+  background: var(--watch);
+}
+
+.dot-high {
+  background: var(--accent);
+}
+
+.dot-overflow {
+  background: var(--critical);
+}
+
+.pill-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.pill-count {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* ============ Panels ============ */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.panel-head {
+  padding: 1rem 1.15rem 0.75rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  /* <--- สามารถเปิดใช้งานหรือเพิ่ม margin-bottom เพื่อดันแผนที่/ตารางลงมาได้ */
+}
+
+.panel-head h2 {
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.hint {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ============ Rain extremes (การ์ดฝนน้อยสุด/มากสุด ใต้ Block รายงานสถานการณ์) ============ */
+.rain-extremes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  /* ไม่มี padding ซ้าย-ขวาเหมือนตอนอยู่ใน .panel — เป็น direct child ของ .app-main
+     ซึ่งมี padding รอบนอกให้แล้ว (เหมือน .status-bar/.hero ที่อยู่ระดับเดียวกัน) */
+  /* ใส่ margin-bottom ตรงๆ (แทนที่จะพึ่ง .app-main gap อย่างเดียว) เพราะ h2 ใน .hero มีแท็ก <strong>
+     เปิดไม่ปิดอยู่แต่เดิม ทำให้ browser มองว่า block นี้ซ้อนอยู่ใต้ .hero ไม่ใช่ sibling ระดับเดียวกันจริงๆ
+     .app-main gap:32px จึงไม่มีผลกับระยะห่างด้านล่างของ block นี้ (มีผลแค่ด้านบน จึงห่างจาก .hero ปกติ) */
+  margin-bottom: 32px;
+}
+
+.rain-extreme-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.rain-extreme-card:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.rain-extreme-card:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.rain-extreme-min {
+  border-left: 3px solid var(--accent);
+}
+
+.rain-extreme-min:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.rain-extreme-max {
+  border-left: 3px solid var(--critical);
+  align-items: flex-end;
+  text-align: right;
+}
+
+.rain-extreme-max:hover:not(:disabled) {
+  border-color: var(--critical);
+}
+
+.rain-extreme-label {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.rain-extreme-value {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.rain-extreme-value .muted {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.rain-extreme-station {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* จอแคบ: เรียงการ์ดซ้อนกันแนวตั้งแทนแบ่งซ้าย-ขวา อ่านง่ายกว่าตอนพื้นที่แคบ */
+@media (max-width: 520px) {
+  .rain-extremes {
+    grid-template-columns: 1fr;
+  }
+
+  .rain-extreme-max {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ============ Map ============ */
+#map {
+  width: 100%;
+  height: 460px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.85rem 1.15rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Legend แบบสเกลละเอียด (ฝนสะสมรายเดือน/รายปี — 25–29 ช่วง)
+   ใช้ grid หลายคอลัมน์ให้ช่วงเรียงเป็นตารางอ่านง่าย แทน flex-wrap ที่จะยืดเป็นแถวยาว */
+.legend.legend-scale {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 0.4rem 0.85rem;
+}
+
+.legend-scale-title {
+  grid-column: 1 / -1;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.legend-swatch {
+  width: 24px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ============ Table ============ */
+.table-head {
+  align-items: center;
+}
+
+.table-controls {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.table-record-count {
+  display: flex;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.table-record-count .count-value {
+  margin: 0 0.3rem;
+  color: var(--accent);
+  font-weight: 700;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+}
+
+.table-search {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  min-width: 200px;
+}
+
+.table-search::placeholder {
+  color: var(--text-muted);
+}
+
+.status-select {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+}
+
+/* ============ Header nav dropdown (น้ำฝน / ระดับน้ำ) ============ */
+.header-nav {
+  position: relative;
+}
+
+.nav-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.nav-dropdown-btn:hover {
+  border-color: var(--accent);
+}
+
+.nav-caret {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  min-width: 150px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  display: none;
+  z-index: 20;
+}
+
+.nav-dropdown-menu.open {
+  display: block;
+}
+
+.nav-dropdown-menu li a {
+  display: block;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+
+.nav-dropdown-menu li a:hover {
+  background: var(--surface-2);
+}
+
+.nav-dropdown-menu li a.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ============ Period selector panel ============ */
+.period-panel {
+  padding: 0.9rem 1.15rem;
+}
+
+.period-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.period-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.period-field label {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.period-hint {
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 420px;
+  /* จุดสำคัญ: จำกัดความสูง แล้ว scroll ภายใน block แทนที่จะยืดหน้าเว็บ */
+  border-top: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+thead th {
+  text-align: left;
+  padding: 0.7rem 1.15rem;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+thead th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+thead th.sortable:hover {
+  color: var(--text);
+}
+
+.sort-indicator {
+  display: inline-block;
+  margin-left: 0.3rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.sort-indicator.active {
+  color: var(--accent);
+}
+
+tbody td {
+  padding: 0.65rem 1.15rem;
+  border-top: 1px solid var(--border);
+}
+
+tbody tr[data-id] {
+  cursor: pointer;
+}
+
+tbody tr:hover {
+  background: var(--surface-2);
+}
+
+tbody tr[data-id]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.status-badge.normal {
+  color: var(--normal);
+  background: rgba(52, 211, 153, 0.12);
+}
+
+.status-badge.watch {
+  color: var(--watch);
+  background: rgba(251, 191, 36, 0.12);
+}
+
+.status-badge.warning {
+  color: var(--warning);
+  background: rgba(251, 146, 60, 0.12);
+}
+
+.status-badge.critical {
+  color: var(--critical);
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.status-badge.critical_low {
+  color: #C084FC;
+  background: rgba(192, 132, 252, 0.12);
+}
+
+.status-badge.low {
+  color: var(--watch);
+  background: rgba(251, 191, 36, 0.12);
+}
+
+.status-badge.high {
+  color: var(--accent);
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.status-badge.overflow {
+  color: var(--critical);
+  background: rgba(248, 113, 113, 0.12);
+}
+
+/* ============ Chart open button (คอลัมน์ "กราฟ" ท้ายตาราง) ============ */
+.chart-open-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--accent);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.chart-open-btn:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+/* ============ Chart modal (กราฟรายสถานี) ============ */
+.chart-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  /* ต้องสูงกว่า #map.pseudo-fullscreen (z-index: 9999) ไม่งั้นตอนเปิดกราฟจากใน popup ระหว่างแผนที่เต็มจอ
+     modal จะถูกแผนที่บังจนมองไม่เห็น (คลิกแล้วเหมือนไม่มีอะไรเกิดขึ้น) */
+  z-index: 10000;
+  background: rgba(6, 10, 20, 0.72);
+  backdrop-filter: blur(2px);
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.chart-modal-overlay.open {
+  display: flex;
+}
+
+body.chart-modal-active {
+  overflow: hidden;
+}
+
+.chart-modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chart-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.chart-modal-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.chart-modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ============ Download/Print dropdown (ในหัว chart modal) ============ */
+.chart-download-wrap {
+  position: relative;
+}
+
+.chart-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 30px;
+  padding: 0 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chart-download-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chart-download-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  padding: 0.35rem;
+  z-index: 10;
+}
+
+.chart-download-menu.open {
+  display: block;
+}
+
+.chart-download-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.chart-download-menu button:hover {
+  background: var(--surface-2);
+}
+
+.chart-modal-close {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.chart-modal-close:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.chart-modal-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 1.15rem 0;
+}
+
+.chart-period-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.chart-period-field label {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.chart-period-field .status-select {
+  min-width: 150px;
+}
+
+.chart-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+/* ============ ช่องวันที่เริ่มต้น/สิ้นสุด (กราฟ 3/5/7/15 วัน) ============ */
+.chart-date-range-nav {
+  display: none;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.chart-date-range-nav input[type="date"] {
+  min-width: 140px;
+  color-scheme: dark; /* ให้ปฏิทิน popup ของเบราว์เซอร์เป็นธีมมืดไปด้วย (Chromium/Firefox รองรับ) */
+}
+
+.chart-date-range-nav input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}
+
+.chart-nav-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chart-nav-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chart-month-label {
+  min-width: 140px;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chart-modal-body {
+  position: relative;
+  padding: 1rem 1.15rem 1.25rem;
+  height: 360px;
+}
+
+#stationChartCanvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chart-modal-status {
+  display: none;
+  position: absolute;
+  inset: 1rem 1.15rem 1.25rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  background: var(--surface);
+}
+
+.chart-modal-status.visible {
+  display: flex;
+}
+
+.chart-modal-status.error {
+  color: var(--critical);
+}
+
+@media (max-width: 640px) {
+  .chart-modal-body {
+    height: 300px;
+  }
+}
+
+/* ============ Footer ============ */
+.app-footer {
+  max-width: 1180px;
+  margin: 0.5rem auto 2rem;
+  padding: 0 1.25rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.footer-note {
+  margin-top: 0.3rem;
+}
+
+.agency-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin: 0 0 1.25rem;
+  flex-wrap: wrap;
+}
+
+.agency-logo {
+  height: 72px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+  transition: transform 0.3s ease, filter 0.3s ease;
+  /* background: rgba(255, 255, 255, 0.9); */
+  border-radius: 10px;
+  padding: 4px 8px;
+}
+
+/* ============ Leaflet dark tweaks ============ */
+.leaflet-container {
+  background: #0E1728;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.leaflet-popup-content {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+}
+
+/* ปุ่มเปิดกราฟย้อนหลังใน popup ของจุดสถานี */
+.popup-chart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.popup-chart-btn:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.leaflet-control-attribution {
+  background: rgba(11, 18, 32, 0.7) !important;
+  color: var(--text-muted) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--accent) !important;
+}
+
+/* ============ Layer control (สลับแผนที่ฐาน/ชั้นข้อมูล) — ธีมมืดให้เข้ากับเว็บ ============
+   หน้าที่เดิมไม่เปลี่ยน (คลิกเปิด/ปิดยังทำงานผ่าน .click-only-layer-control ใน map.js เหมือนเดิม)
+   ปรับแค่หน้าตา: ปุ่มย่อ/ขยาย ให้เป็นไอคอนคงที่แทนสไปรท์ขาวดำเดิม, การ์ดรายการให้มีขอบ/เงา/ระยะห่างเข้าธีม,
+   ช่อง radio/checkbox ให้เป็นสี accent ของเว็บ, มีหัวข้อกลุ่ม "แผนที่ฐาน"/"ชั้นข้อมูล" คั่นให้อ่านง่ายขึ้น */
+.leaflet-control-layers {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.leaflet-control-layers-toggle {
+  width: 34px !important;
+  height: 34px !important;
+  background-image: none;
+  filter: none;
+  position: relative;
+}
+
+.leaflet-control-layers-toggle::before {
+  content: '☰';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.leaflet-control-layers-expanded {
+  padding: 0.75rem 0.85rem !important;
+  min-width: 190px;
+}
+
+.leaflet-control-layers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* หัวข้อกลุ่ม (ไม่มีใน markup เดิมของ Leaflet) — เติมด้วย ::before ล้วนๆ ไม่ต้องแก้ HTML/JS */
+.leaflet-control-layers-base::before {
+  content: 'แผนที่ฐาน';
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0 0 0.35rem;
+}
+
+.leaflet-control-layers-overlays::before {
+  content: 'ชั้นข้อมูล';
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0.15rem 0 0.35rem;
+}
+
+.leaflet-control-layers-base,
+.leaflet-control-layers-overlays {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.leaflet-control-layers-separator {
+  margin: 0.6rem 0 !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+.leaflet-control-layers label {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: background 0.15s ease;
+}
+
+.leaflet-control-layers label:hover {
+  background: var(--surface-2);
+}
+
+.leaflet-control-layers label > span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leaflet-control-layers-selector {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.district-tooltip {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+}
+
+/* ============ Zoom / Fullscreen / GPS controls (มุมซ้ายบนแผนที่) — ธีมมืดให้เข้ากับเว็บ ============
+   ทั้ง 3 กลุ่มปุ่มใช้ class .leaflet-bar ของ Leaflet ร่วมกัน จึงปรับที่เดียวครอบคลุมทั้งหมด
+   หน้าที่เดิมไม่เปลี่ยน (zoom in/out, สลับเต็มจอ, หาตำแหน่งปัจจุบัน) ปรับแค่สี/ขนาด/เงาให้เข้าธีม
+   เหมือนที่ทำกับ layer control ไปแล้ว — ใช้ !important กับ width/height เพราะโหมดจำลองอุปกรณ์สัมผัส
+   (.leaflet-touch) ของ Leaflet มี selector เฉพาะที่ specificity สูงกว่า จะมาทับขนาดปุ่มเราไม่ให้ */
+.leaflet-bar {
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  overflow: hidden;
+}
+
+.leaflet-bar a {
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-bottom: 1px solid var(--border) !important;
+  font-size: 1.05rem;
+  transition: background 0.15s ease;
+}
+
+.leaflet-bar a:last-child {
+  border-bottom: none !important;
+}
+
+.leaflet-bar a:hover {
+  background: var(--surface-2) !important;
+}
+
+.leaflet-bar a.leaflet-disabled,
+.leaflet-bar a.leaflet-disabled:hover {
+  background: var(--surface) !important;
+  color: var(--text-muted) !important;
+  opacity: 0.55;
+}
+
+/* ปุ่มขยายแผนที่เต็มจอ */
+.leaflet-control-fullscreen a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  text-decoration: none;
+}
+
+/* ตอนแผนที่อยู่ในโหมดเต็มจอ (pseudo-fullscreen ด้วย CSS ล้วนๆ ไม่พึ่ง Fullscreen API ของเบราว์เซอร์
+   เพื่อให้ทำงานเหมือนกันทุกอุปกรณ์ รวมถึง iOS และ PWA แบบ Add to Home Screen)
+   ต้องใช้ !important กับ position/width/height เพราะ Leaflet เซ็ต style="position:relative" แบบ inline
+   ให้ #map ไว้เองตอน init (inline style ชนะ CSS selector ทุกแบบยกเว้นใช้ !important สู้) —
+   ถ้าไม่มี !important ตรงนี้ ตอนกดเต็มจอแผนที่จะไม่ fixed จริง กลายเป็นลอยผิดตำแหน่งแทน */
+#map.pseudo-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  /* height: 100dvh รองรับ dynamic viewport height บนมือถือ (กัน address bar บังพื้นที่ท้ายจอ) — ทับ vh ด้านบนเป็น fallback */
+  height: 100dvh !important;
+  z-index: 9999;
+  border-radius: 0;
+}
+
+/* ล็อกไม่ให้หน้าเว็บด้านหลัง scroll ได้ตอนแผนที่เต็มจอ (กันสับสนตอนปัดหน้าจอ) */
+body.pseudo-fullscreen-active {
+  overflow: hidden;
+}
+
+/* ============ Map legend — โหมดลอยมุมซ้ายล่างตอนแผนที่เต็มจอ (มุมเดียวกับ radar control) ============ */
+.legend.legend-floating {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  max-width: 240px;
+  max-height: 50vh;
+  overflow-y: auto;
+  background: rgba(18, 27, 46, 0.92);
+  border: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 0.8rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+
+.legend.legend-scale.legend-floating {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 0.3rem 0.5rem;
+  max-width: 300px;
+  font-size: 0.72rem;
+}
+
+/* ============ Filter toggle control (ยุบ/แสดงตัวกรอง ตอนแผนที่เต็มจอ) ============ */
+.filter-toggle-control {
+  display: none;
+  pointer-events: auto;
+}
+
+/* ============ Legend toggle control (ยุบ/แสดง Map Legend ตอนแผนที่เต็มจอ) ============ */
+.legend-toggle-control {
+  display: none;
+  pointer-events: auto;
+}
+
+.legend-toggle-btn {
+  display: block;
+  width: 100%;
+  background: rgba(18, 27, 46, 0.92);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.legend-toggle-btn:hover {
+  border-color: var(--accent);
+}
+
+.legend-toggle-content {
+  margin-top: 0.5rem;
+}
+
+.filter-toggle-btn {
+  display: block;
+  width: 100%;
+  background: rgba(18, 27, 46, 0.92);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.filter-toggle-btn:hover {
+  border-color: var(--accent);
+}
+
+.filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  width: 260px;
+  max-width: calc(100vw - 80px);
+  max-height: 60vh;
+  overflow-y: auto;
+  background: rgba(18, 27, 46, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ============ Table toggle control (ยุบ/แสดงตารางข้อมูล ตอนแผนที่เต็มจอ มุมขวาล่าง) ============ */
+.table-toggle-control {
+  display: none;
+  pointer-events: auto;
+}
+
+.table-toggle-btn {
+  display: block;
+  width: 100%;
+  background: rgba(18, 27, 46, 0.92);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.table-toggle-btn:hover {
+  border-color: var(--accent);
+}
+
+/* กว้างกว่า filter-panel เพราะต้องใส่ตารางหลายคอลัมน์ — ยังจำกัดด้วย 100vw กันล้นจอมือถือ
+   ส่วนความสูงย่อลงจาก .table-wrap ปกติ (420px) เหลือ 40vh เพราะแผนที่เต็มจอมีพื้นที่ให้แบ่งจำกัดกว่าหน้าเว็บปกติ */
+.table-panel {
+  margin-top: 0.5rem;
+  width: min(560px, calc(100vw - 40px));
+  background: rgba(18, 27, 46, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.table-panel .table-wrap {
+  max-height: 40vh;
+  border-top: none;
+}
+
+@media (max-width: 640px) {
+  .table-panel {
+    width: calc(100vw - 24px);
+    padding: 0.4rem;
+  }
+
+  .table-panel .table-wrap {
+    max-height: 34vh;
+  }
+}
+
+/* #periodRow ที่ปกติวางเป็นแถวแนวนอนใต้แผนที่ ตอนย้ายมาอยู่ใน filter-panel แคบๆ มุมขวาบน
+   ให้เรียงเป็นแนวตั้งแทน อ่านง่ายกว่าและไม่ต้องกว้างเท่าจอ */
+.filter-panel .period-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+}
+
+.filter-panel .period-field {
+  width: 100%;
+}
+
+.filter-panel .status-select,
+.filter-panel .table-search {
+  width: 100%;
+  min-width: 0;
+}
+
+.filter-panel .period-hint {
+  margin: 0.2rem 0 0;
+}
+
+/* ============ Radar control (RainViewer play/pause + timeline) ============ */
+.radar-control {
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(11, 18, 32, 0.85);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem 0.35rem 0.35rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+
+.radar-play-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #041018;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.radar-play-btn:hover {
+  filter: brightness(1.1);
+}
+
+.radar-slider {
+  width: 140px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.radar-time-label {
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 860px) {
+  .radar-slider {
+    width: 90px;
+  }
+}
+
+/* ============ IDW opacity control (แถบเลื่อนความโปร่งใส layer IDW) — ใช้โครง .radar-control เดิม ============ */
+.idw-opacity-label {
+  flex-shrink: 0;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.idw-opacity-control .radar-time-label {
+  min-width: 40px;
+}
+
+/* GPS Control */
+.gps-control {
+  font-size: 20px !important;
+  line-height: 34px !important;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* ============ Responsive ============ */
+@media (max-width: 860px) {
+  .status-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #map {
+    height: 340px;
+  }
+
+  /* จอแคบ: ลดความกว้างคอลัมน์ legend สเกลละเอียดลง ให้ยังได้ 2 คอลัมน์ */
+  .legend.legend-scale {
+    grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+    gap: 0.35rem 0.5rem;
+    font-size: 0.74rem;
+  }
+
+  /* แก้ปัญหาข้อความ .hero "หุบเข้าออก" บนมือถือ:
+     สาเหตุคือนาฬิกา #liveClock เปลี่ยนเลขทุกวินาที ทำให้ความกว้างที่เหลือให้ข้อความ
+     ขยับติดขอบจุดตัดคำ (wrap point) พอดี สลับบรรทัดไปมาทุกครั้งที่นาฬิกา tick
+     แก้โดยให้นาฬิกาลงมาอยู่คนละแถวกับข้อความแทนการแย่งพื้นที่กันซ้าย-ขวา */
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 24px 22px;
+  }
+
+  .header-clock {
+    align-self: stretch;
+    text-align: left;
+  }
+
+  /* แก้ปัญหา dropdown (น้ำฝน/ระดับน้ำ) ล้นออกนอกจอบนมือถือ:
+     .header-inner เป็น flex-wrap พอจอแคบ .header-nav จะตกลงบรรทัดใหม่แล้วไปอยู่ชิดซ้าย
+     แต่ .nav-dropdown-menu ตั้ง right:0 + min-width:150px เมนูจึงกางออกไปทางซ้ายของปุ่ม
+     เลยขอบจอซ้าย ทำให้ถูกตัดหาย (เห็นแค่บางส่วนของข้อความ)
+     แก้โดยดัน .header-nav ไปชิดขวาของ header เมนูจะกางเข้ามาในจอพอดี */
+  .header-nav {
+    margin-left: auto;
+  }
+
+  /* กันไว้อีกชั้น: จอที่แคบมากก็ไม่ให้เมนูกว้างเกินหน้าจอ */
+  .nav-dropdown-menu {
+    max-width: calc(100vw - 2.5rem);
+  }
+}

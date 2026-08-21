@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MHS Water | ระบบเฝ้าระวังและติดตามปริมาณน้ำฝน จังหวัดแม่ฮ่องสอน</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Sarabun:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2">
+
+  <!-- ICON For Add to Home Screen -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0d6efd">
+
+  <link rel="icon" type="image/png" href="./icons/logo3-removebg-preview.png">
+  <link rel="apple-touch-icon" href="./icons/logo3-removebg-preview.png">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+</head>
+
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <a class="logo" href="https://www.msrid.com/msrid2568/" target="_blank" rel="noopener noreferrer">
+          <img src=" https://rid1.rid.go.th/app/images/logo.png" alt="โครงการชลประทานแม่ฮ่องสอน">
+        </a>
+        <!-- <div class="brand-mark">MH</div> -->
+        <div class="brand-text">
+          <h1>MHS Water</h1>
+          <p>ระบบเฝ้าระวังและติดตามปริมาณน้ำฝน <span style="white-space: nowrap;">จังหวัดแม่ฮ่องสอน</span></p>
+        </div>
+      </div>
+
+      <!-- Dropdown สลับหมวดข้อมูล: น้ำฝน / ระดับน้ำ -->
+      <nav class="header-nav">
+        <div class="nav-dropdown" id="navDropdown">
+          <button class="nav-dropdown-btn" id="navDropdownBtn" type="button">
+            <span id="navCurrentLabel">น้ำฝน</span>
+            <span class="nav-caret">▾</span>
+          </button>
+          <ul class="nav-dropdown-menu" id="navDropdownMenu">
+            <li><a href="index.html" class="active">น้ำฝน</a></li>
+            <li><a href="waterlevel.html">ระดับน้ำ</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">MAE HONG SON <span style="white-space: nowrap;">RAINFALL MONITORING</span></p>
+        <h2><strong>รายงานสถานการณ์<span style="white-space: nowrap;">ปริมาณน้ำฝน</span><br>
+            <span><strong>จังหวัดแม่ฮ่องสอน</strong></span></h2>
+        <p class="eyebrow"><small>ข้อมูลปริมาณน้ำฝนจากคลังข้อมูลน้ำแห่งชาติ (สสน.)</small></p>
+      </div>
+      <div class="header-clock">
+        <span class="clock-label">เวลาปัจจุบัน</span>
+        <span id="liveClock" class="clock-value">--:--:--</span>
+        <span id="liveDate" class="date-value">กำลังโหลดวันที่...</span>
+      </div>
+    </section>
+
+    <!-- ============ RAIN EXTREMES (ฝนน้อยสุด/มากสุด) ============ -->
+    <div class="rain-extremes" id="rainExtremes">
+      <button type="button" class="rain-extreme-card rain-extreme-min" id="rainExtremeMin">
+        <span class="rain-extreme-label">🔵 ฝนน้อยสุด</span>
+        <span class="rain-extreme-value">- <span class="muted">มม.</span></span>
+        <span class="rain-extreme-station">-</span>
+      </button>
+      <button type="button" class="rain-extreme-card rain-extreme-max" id="rainExtremeMax">
+        <span class="rain-extreme-label">🔴 ฝนมากสุด</span>
+        <span class="rain-extreme-value">- <span class="muted">มม.</span></span>
+        <span class="rain-extreme-station">-</span>
+      </button>
+    </div>
+
+    <!-- ============ STATUS SUMMARY BAR ============ -->
+    <section class="status-bar" id="statusBar">
+      <div class="status-pill">
+        <span class="dot dot-total"></span>
+        <span class="pill-label">สถานีทั้งหมด</span>
+        <span class="pill-count" id="countTotal">0</span>
+      </div>
+      <div class="status-pill">
+        <span class="dot dot-normal"></span>
+        <span class="pill-label">ฝนตกเล็กน้อย</span>
+        <span class="pill-count" id="countNormal">0</span>
+      </div>
+      <div class="status-pill">
+        <span class="dot dot-watch"></span>
+        <span class="pill-label">ฝนตกปานกลาง</span>
+        <span class="pill-count" id="countWatch">0</span>
+      </div>
+      <div class="status-pill">
+        <span class="dot dot-warning"></span>
+        <span class="pill-label">ฝนตกหนัก</span>
+        <span class="pill-count" id="countWarning">0</span>
+      </div>
+      <div class="status-pill">
+        <span class="dot dot-critical"></span>
+        <span class="pill-label">ฝนตกหนักมาก</span>
+        <span class="pill-count" id="countCritical">0</span>
+      </div>
+    </section>
+
+    <!-- ============ MAP ============ -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>แผนที่แสดงปริมาณน้ำฝน</h2>
+        <p class="hint">คลิกจุดสถานีเพื่อดูรายละเอียด</p>
+      </div>
+      <div id="map"></div>
+      <div class="legend" id="mapLegend"></div>
+    </section>
+
+    <!-- ============ PERIOD SELECTOR (ชุดข้อมูลย่อย) ============ -->
+    <section class="panel period-panel">
+      <div class="period-row" id="periodRow">
+        <div class="period-field">
+          <label for="periodSelect">ช่วงเวลา</label>
+          <select id="periodSelect" class="status-select">
+            <option value="rain_24h" selected>24 ชั่วโมง</option>
+            <option value="rain_today">ฝนวันนี้</option>
+            <option value="rain_yesterday">ฝนวานนี้</option>
+            <option value="rain3d">3 วัน</option>
+            <option value="rain5d">5 วัน</option>
+            <option value="rain7d">7 วัน</option>
+            <option value="rain15d">15 วัน</option>
+            <option value="rain_monthly">รายเดือน</option>
+            <option value="rain_yearly">รายปี</option>
+          </select>
+        </div>
+        <div class="period-field">
+          <label for="districtSelect">อำเภอ</label>
+          <select id="districtSelect" class="status-select">
+            <option value="">ทุกอำเภอ</option>
+          </select>
+        </div>
+        <div class="period-field">
+          <label for="tambonSelect">ตำบล</label>
+          <select id="tambonSelect" class="status-select">
+            <option value="">ทุกตำบล</option>
+          </select>
+        </div>
+        <div class="period-field">
+          <label for="agencySelect">หน่วยงาน</label>
+          <select id="agencySelect" class="status-select">
+            <option value="">ทุกหน่วยงาน</option>
+          </select>
+        </div>
+        <p class="period-hint" id="periodHint">แสดงข้อมูล ณ 24 ชั่วโมงล่าสุด จากคลังข้อมูลน้ำแห่งชาติ (สสน.)</p>
+      </div>
+    </section>
+
+    <!-- ============ TABLE ============ -->
+    <section class="panel">
+      <div class="panel-head table-head">
+        <div>
+          <h2>ข้อมูลปริมาณฝนล่าสุด</h2>
+          <p class="hint">แสดงค่าล่าสุดจากทุกสถานี เรียงตามเวลาล่าสุด</p>
+        </div>
+        <div class="table-record-count">พบ <span id="recordCountValue" class="count-value">0</span> รายการ</div>
+        <div class="table-control">
+          <input type="text" id="tableSearch" class="table-search" placeholder="ค้นหาสถานี ตำบล หรืออำเภอ">
+          <select id="statusFilter" class="status-select">
+            <option value="">ทุกสถานะ</option>
+            <option value="normal">เล็กน้อย</option>
+            <option value="watch">ปานกลาง</option>
+            <option value="warning">หนัก</option>
+            <option value="critical">หนักมาก</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="reportTable">
+          <thead>
+            <tr>
+              <th>สถานี</th>
+              <th>ตำบล</th>
+              <th>อำเภอ</th>
+              <th class="text-right sortable" id="sortRainfallHeader" tabindex="0" role="button" aria-label="เรียงลำดับตามปริมาณฝน">ปริมาณฝน (มม.)<span class="sort-indicator" id="sortRainfallIndicator"></span></th>
+              <th>สถานะ</th>
+              <th>เวลาข้อมูล</th>
+              <th class="text-center">กราฟ</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody">
+            <tr>
+              <td colspan="7" class="text-center muted">กำลังโหลดข้อมูล...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ CHART MODAL (กราฟรายสถานี) ============ -->
+  <div class="chart-modal-overlay" id="chartModalOverlay">
+    <div class="chart-modal" role="dialog" aria-modal="true" aria-labelledby="chartModalTitle">
+      <div class="chart-modal-header">
+        <h3 id="chartModalTitle">กราฟฝนสถานี</h3>
+        <div class="chart-modal-header-actions">
+          <div class="chart-download-wrap" id="chartDownloadWrap">
+            <button type="button" class="chart-download-btn" id="chartDownloadBtn" aria-haspopup="true" aria-expanded="false">⬇ ดาวน์โหลด</button>
+            <div class="chart-download-menu" id="chartDownloadMenu">
+              <button type="button" data-action="print">Print Chart</button>
+              <button type="button" data-action="png">Download PNG</button>
+              <button type="button" data-action="jpeg">Download JPEG</button>
+              <button type="button" data-action="pdf">Download PDF</button>
+              <button type="button" data-action="svg">Download SVG</button>
+            </div>
+          </div>
+          <button type="button" class="chart-modal-close" id="chartModalClose" aria-label="ปิด">✕</button>
+        </div>
+      </div>
+      <div class="chart-modal-controls">
+        <div class="chart-period-field">
+          <label for="chartPeriodSelect">ประเภทข้อมูล</label>
+          <select id="chartPeriodSelect" class="status-select">
+            <option value="rain_24h">ฝน 24 ชั่วโมง</option>
+            <option value="rain_today">ฝนวันนี้</option>
+            <option value="rain_yesterday">ฝนเมื่อวาน</option>
+            <option value="rain3d">ฝน 3 วัน</option>
+            <option value="rain5d">ฝน 5 วัน</option>
+            <option value="rain7d">ฝน 7 วัน</option>
+            <option value="rain15d">ฝน 15 วัน</option>
+            <option value="rain_monthly" selected>ฝนรายเดือน</option>
+            <option value="rain_yearly">ฝนรายปี</option>
+          </select>
+        </div>
+        <div class="chart-month-nav" id="chartMonthNav">
+          <div class="chart-period-field">
+            <label for="chartMonthSelect">เดือน</label>
+            <select id="chartMonthSelect" class="status-select"></select>
+          </div>
+        </div>
+        <div class="chart-period-field" id="chartYearNav">
+          <label for="chartYearSelect">ปี</label>
+          <select id="chartYearSelect" class="status-select"></select>
+        </div>
+        <div class="chart-date-range-nav" id="chartDateRangeNav">
+          <div class="chart-period-field">
+            <label for="chartStartDate">วันที่เริ่มต้น</label>
+            <input type="date" id="chartStartDate" class="status-select">
+          </div>
+          <div class="chart-period-field">
+            <label for="chartEndDate">วันที่สิ้นสุด</label>
+            <input type="date" id="chartEndDate" class="status-select">
+          </div>
+        </div>
+      </div>
+      <div class="chart-modal-body">
+        <canvas id="stationChartCanvas"></canvas>
+        <div class="chart-modal-status" id="chartModalStatus"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="agency-logos">
+        <img src="https://disaster.mhs-pao.go.th/images/logo_mhs.png" alt="องค์การบริหารส่วนจังหวัดแม่ฮ่องสอน"
+          class="agency-logo">
+        <img src="https://disaster.mhs-pao.go.th/images/logo_mhs-pao.png" alt="อบจ.แม่ฮ่องสอน" class="agency-logo">
+        <img src="https://disaster.mhs-pao.go.th/images/logo_pp.jpg"
+          alt="ศูนย์ป้องกันและบรรเทาสาธารณภัยจังหวัดแม่ฮ่องสอน" class="agency-logo">
+        <img src="https://rid1.rid.go.th/app/images/logo.png" alt="กรมชลประทาน" class="agency-logo">
+        <img src="https://dwr.go.th/uploads/userfiles/images/Logodwr.png" alt="กรมทรัพยากรน้ำ" class="agency-logo">
+        <img src="https://www.hii.or.th/wp-content/themes/hii2019/assets/images/HIILogo_TH-360x360.png"
+          alt="สถาบันสารสนเทศทรัพยากรน้ำ" class="agency-logo">
+      </div>
+      <!-- <p>แหล่งข้อมูล <span style="white-space: nowrap;"><a href="https://disaster.mhs-pao.go.th" target="_blank"
+            rel="noopener">ระบบรายงานสาธารณภัยจังหวัดแม่ฮ่องสอน (อบจ.แม่ฮ่องสอน)</span></a>
+        <span style="white-space: nowrap;">ผ่าน Rainfall API</span>
+      </p> -->
+      <p class="footer-note">พัฒนาโดย โครงการชลประทานแม่ฮ่องสอน สำนักงานชลประทานที่ 1 กรมชลประทาน<br>
+        ข้อมูลเพื่อการเฝ้าระวัง โปรดติดตามประกาศจากหน่วยงานภาครัฐ</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="map.js?v=22"></script>
+  <script src="main.js?v=22"></script>
+  <script src="station-chart.js?v=9"></script>
+</body>
+
+</html>
