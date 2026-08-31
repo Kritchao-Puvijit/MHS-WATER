@@ -208,25 +208,19 @@ function initMap() {
     }
   });
 
-  const CartoDB_DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 25,
-    subdomains: 'abcd',
-  }).addTo(map);
-
   const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 25,
   });
 
   const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 25
-  });
+  }).addTo(map);
 
   const terrainLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
     maxZoom: 25,
   });
 
   const baseMaps = {
-    'แผนที่โทนมืด': CartoDB_DarkMatter,
     'แผนที่ถนน': osmLayer,
     'ภาพถ่ายดาวเทียม': satelliteLayer,
     'แผนที่ภูมิประเทศ': terrainLayer
