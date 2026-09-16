@@ -179,7 +179,7 @@ function populateChartYearOptions(selectedYear) {
 function populateChartMonthOptions(selectedMonth) {
   const select = document.getElementById('chartMonthSelect');
   if (!select) return;
-  select.innerHTML = THAI_MONTHS.map((name, i) => `<option value="${i + 1}">${name}</option>`).join('');
+  select.innerHTML = THAI_MONTHS.map((_, i) => `<option value="${i + 1}">${monthName(i)}</option>`).join('');
   select.value = String(selectedMonth);
 }
 
@@ -216,7 +216,10 @@ function openStationChart(stationId, stationName, fetchFn) {
     setDefaultDateRangeDays(7); // หน้าที่ไม่มี period dropdown (ระดับน้ำ) — ค่าเริ่มต้น 7 วันล่าสุด
   }
 
-  document.getElementById('chartModalTitle').textContent = `กราฟสถานี${stationName}`;
+  const titlePrefix = document.getElementById('chartPeriodSelect') ? t('chart.title.rain') : t('chart.title.water');
+  document.getElementById('chartModalTitle').textContent = getLang() === 'en'
+    ? `${titlePrefix} ${localizeName(stationName)}`
+    : `กราฟสถานี${stationName}`;
   document.getElementById('chartModalOverlay').classList.add('open');
   document.body.classList.add('chart-modal-active');
 
@@ -257,17 +260,17 @@ async function loadChartData() {
   const monthLabelEl = document.getElementById('chartMonthLabel');
   if (monthLabelEl) {
     monthLabelEl.textContent = currentChartPeriod === 'rain_monthly'
-      ? `${THAI_MONTHS[currentChartMonth - 1]} ${currentChartYear + 543}`
+      ? (getLang() === 'en' ? `${monthName(currentChartMonth - 1)} ${currentChartYear}` : `${monthName(currentChartMonth - 1)} ${currentChartYear + 543}`)
       : '';
   }
-  setChartStatus('กำลังโหลดข้อมูล...', false);
+  setChartStatus(t('table.loading'), false);
 
   try {
     const result = await currentChartStation.fetchFn(currentChartStation.id, currentChartPeriod, currentChartMonth, currentChartYear, currentChartStartDate, currentChartEndDate);
     if (token !== chartRequestToken) return; // ผู้ใช้สลับเดือน/ประเภทไปแล้วก่อน response นี้จะมาถึง — ทิ้งผลลัพธ์เก่านี้
 
     if (!result || !result.labels || !result.labels.length) {
-      setChartStatus('ไม่มีข้อมูลย้อนหลังสำหรับสถานีนี้ในช่วงเวลาที่เลือก', true);
+      setChartStatus(t('chart.noData'), true);
       renderChart(null);
       return;
     }
@@ -276,7 +279,7 @@ async function loadChartData() {
     renderChart(result);
   } catch (err) {
     if (token !== chartRequestToken) return;
-    setChartStatus(err.message || 'โหลดข้อมูลกราฟไม่สำเร็จ', true);
+    setChartStatus(err.message || t('chart.loadFailed'), true);
     renderChart(null);
   }
 }
@@ -553,10 +556,10 @@ function downloadChartAsPdf(canvas, filename) {
 
 function printChartImage(canvas) {
   const dataUrl = canvas.toDataURL('image/png', 1);
-  const title = currentChartStation ? `กราฟสถานี${currentChartStation.name}` : 'กราฟ';
+  const title = document.getElementById('chartModalTitle')?.textContent || 'Chart';
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
-    setChartStatus('เบราว์เซอร์บล็อกหน้าต่างพิมพ์ กรุณาอนุญาต popup แล้วลองใหม่', true);
+    setChartStatus(getLang() === 'en' ? 'Browser blocked the print window — please allow popups and try again' : 'เบราว์เซอร์บล็อกหน้าต่างพิมพ์ กรุณาอนุญาต popup แล้วลองใหม่', true);
     return;
   }
   printWindow.document.write(`<!DOCTYPE html>

@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Sarabun:wght@400;500;600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 
   <!-- ICON For Add to Home Screen -->
   <link rel="manifest" href="manifest.webmanifest">
@@ -37,7 +37,7 @@
         <!-- <div class="brand-mark">MH</div> -->
         <div class="brand-text">
           <h1>MHS Water</h1>
-          <p>ระบบเฝ้าระวังและติดตามปริมาณน้ำฝน <span style="white-space: nowrap;">จังหวัดแม่ฮ่องสอน</span></p>
+          <p><span data-i18n="brand.subtitle.rain">ระบบเฝ้าระวังและติดตามปริมาณน้ำฝน</span> <span data-i18n="hero.line2" style="white-space: nowrap;">จังหวัดแม่ฮ่องสอน</span></p>
         </div>
       </div>
 
@@ -45,12 +45,12 @@
       <nav class="header-nav">
         <div class="nav-dropdown" id="navDropdown">
           <button class="nav-dropdown-btn" id="navDropdownBtn" type="button">
-            <span id="navCurrentLabel">น้ำฝน</span>
+            <span id="navCurrentLabel" data-i18n="nav.rain">น้ำฝน</span>
             <span class="nav-caret">▾</span>
           </button>
           <ul class="nav-dropdown-menu" id="navDropdownMenu">
-            <li><a href="index.html" class="active">น้ำฝน</a></li>
-            <li><a href="waterlevel.html">ระดับน้ำ</a></li>
+            <li><a href="index.html" class="active" data-i18n="nav.rain">น้ำฝน</a></li>
+            <li><a href="waterlevel.html" data-i18n="nav.waterlevel">ระดับน้ำ</a></li>
           </ul>
         </div>
       </nav>
@@ -61,12 +61,12 @@
     <section class="hero">
       <div>
         <p class="eyebrow">MAE HONG SON <span style="white-space: nowrap;">RAINFALL MONITORING</span></p>
-        <h2><strong>รายงานสถานการณ์<span style="white-space: nowrap;">ปริมาณน้ำฝน</span><br>
-            <span><strong>จังหวัดแม่ฮ่องสอน</strong></span></h2>
-        <p class="eyebrow"><small>ข้อมูลปริมาณน้ำฝนจากคลังข้อมูลน้ำแห่งชาติ (สสน.)</small></p>
+        <h2><strong><span data-i18n="hero.line1.rain">รายงานสถานการณ์</span><span data-i18n="hero.line1b.rain" style="white-space: nowrap;">ปริมาณน้ำฝน</span><br>
+            <span><strong data-i18n="hero.line2">จังหวัดแม่ฮ่องสอน</strong></span></h2>
+        <p class="eyebrow"><small data-i18n="hero.source.rain">ข้อมูลปริมาณน้ำฝนจากคลังข้อมูลน้ำแห่งชาติ (สสน.)</small></p>
       </div>
       <div class="header-clock">
-        <span class="clock-label">เวลาปัจจุบัน</span>
+        <span class="clock-label" data-i18n="clock.label">เวลาปัจจุบัน</span>
         <span id="liveClock" class="clock-value">--:--:--</span>
         <span id="liveDate" class="date-value">กำลังโหลดวันที่...</span>
       </div>
@@ -75,13 +75,13 @@
     <!-- ============ RAIN EXTREMES (ฝนน้อยสุด/มากสุด) ============ -->
     <div class="rain-extremes" id="rainExtremes">
       <button type="button" class="rain-extreme-card rain-extreme-min" id="rainExtremeMin">
-        <span class="rain-extreme-label">🔵 ฝนน้อยสุด</span>
-        <span class="rain-extreme-value">- <span class="muted">มม.</span></span>
+        <span class="rain-extreme-label" data-i18n="extremes.min">🔵 ฝนน้อยสุด</span>
+        <span class="rain-extreme-value">- <span class="muted" data-i18n="unit.mm">มม.</span></span>
         <span class="rain-extreme-station">-</span>
       </button>
       <button type="button" class="rain-extreme-card rain-extreme-max" id="rainExtremeMax">
-        <span class="rain-extreme-label">🔴 ฝนมากสุด</span>
-        <span class="rain-extreme-value">- <span class="muted">มม.</span></span>
+        <span class="rain-extreme-label" data-i18n="extremes.max">🔴 ฝนมากสุด</span>
+        <span class="rain-extreme-value">- <span class="muted" data-i18n="unit.mm">มม.</span></span>
         <span class="rain-extreme-station">-</span>
       </button>
     </div>
@@ -90,27 +90,27 @@
     <section class="status-bar" id="statusBar">
       <div class="status-pill">
         <span class="dot dot-total"></span>
-        <span class="pill-label">สถานีทั้งหมด</span>
+        <span class="pill-label" data-i18n="status.total">สถานีทั้งหมด</span>
         <span class="pill-count" id="countTotal">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-normal"></span>
-        <span class="pill-label">ฝนตกเล็กน้อย</span>
+        <span class="pill-label" data-i18n="status.rain.normal">ฝนตกเล็กน้อย</span>
         <span class="pill-count" id="countNormal">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-watch"></span>
-        <span class="pill-label">ฝนตกปานกลาง</span>
+        <span class="pill-label" data-i18n="status.rain.watch">ฝนตกปานกลาง</span>
         <span class="pill-count" id="countWatch">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-warning"></span>
-        <span class="pill-label">ฝนตกหนัก</span>
+        <span class="pill-label" data-i18n="status.rain.warning">ฝนตกหนัก</span>
         <span class="pill-count" id="countWarning">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-critical"></span>
-        <span class="pill-label">ฝนตกหนักมาก</span>
+        <span class="pill-label" data-i18n="status.rain.critical">ฝนตกหนักมาก</span>
         <span class="pill-count" id="countCritical">0</span>
       </div>
     </section>
@@ -118,8 +118,8 @@
     <!-- ============ MAP ============ -->
     <section class="panel">
       <div class="panel-head">
-        <h2>แผนที่แสดงปริมาณน้ำฝน</h2>
-        <p class="hint">คลิกจุดสถานีเพื่อดูรายละเอียด</p>
+        <h2 data-i18n="map.title.rain">แผนที่แสดงปริมาณน้ำฝน</h2>
+        <p class="hint" data-i18n="map.hint">คลิกจุดสถานีเพื่อดูรายละเอียด</p>
       </div>
       <div id="map"></div>
       <div class="legend" id="mapLegend"></div>
@@ -129,38 +129,38 @@
     <section class="panel period-panel">
       <div class="period-row" id="periodRow">
         <div class="period-field">
-          <label for="periodSelect">ช่วงเวลา</label>
+          <label for="periodSelect" data-i18n="filter.period">ช่วงเวลา</label>
           <select id="periodSelect" class="status-select">
-            <option value="rain_24h" selected>24 ชั่วโมง</option>
-            <option value="rain_today">ฝนวันนี้</option>
-            <option value="rain_yesterday">ฝนวานนี้</option>
-            <option value="rain3d">3 วัน</option>
-            <option value="rain5d">5 วัน</option>
-            <option value="rain7d">7 วัน</option>
-            <option value="rain15d">15 วัน</option>
-            <option value="rain_monthly">รายเดือน</option>
-            <option value="rain_yearly">รายปี</option>
+            <option value="rain_24h" selected data-i18n="period.24h">24 ชั่วโมง</option>
+            <option value="rain_today" data-i18n="period.today">ฝนวันนี้</option>
+            <option value="rain_yesterday" data-i18n="period.yesterday">ฝนวานนี้</option>
+            <option value="rain3d" data-i18n="period.3d">3 วัน</option>
+            <option value="rain5d" data-i18n="period.5d">5 วัน</option>
+            <option value="rain7d" data-i18n="period.7d">7 วัน</option>
+            <option value="rain15d" data-i18n="period.15d">15 วัน</option>
+            <option value="rain_monthly" data-i18n="period.monthly">รายเดือน</option>
+            <option value="rain_yearly" data-i18n="period.yearly">รายปี</option>
           </select>
         </div>
         <div class="period-field">
-          <label for="districtSelect">อำเภอ</label>
+          <label for="districtSelect" data-i18n="filter.district">อำเภอ</label>
           <select id="districtSelect" class="status-select">
-            <option value="">ทุกอำเภอ</option>
+            <option value="" data-i18n="filter.allDistrict">ทุกอำเภอ</option>
           </select>
         </div>
         <div class="period-field">
-          <label for="tambonSelect">ตำบล</label>
+          <label for="tambonSelect" data-i18n="filter.tambon">ตำบล</label>
           <select id="tambonSelect" class="status-select">
-            <option value="">ทุกตำบล</option>
+            <option value="" data-i18n="filter.allTambon">ทุกตำบล</option>
           </select>
         </div>
         <div class="period-field">
-          <label for="agencySelect">หน่วยงาน</label>
+          <label for="agencySelect" data-i18n="filter.agency">หน่วยงาน</label>
           <select id="agencySelect" class="status-select">
-            <option value="">ทุกหน่วยงาน</option>
+            <option value="" data-i18n="filter.allAgency">ทุกหน่วยงาน</option>
           </select>
         </div>
-        <p class="period-hint" id="periodHint">แสดงข้อมูล ณ 24 ชั่วโมงล่าสุด จากคลังข้อมูลน้ำแห่งชาติ (สสน.)</p>
+        <p class="period-hint" id="periodHint" data-i18n="period.hint">แสดงข้อมูล ณ 24 ชั่วโมงล่าสุด จากคลังข้อมูลน้ำแห่งชาติ (สสน.)</p>
       </div>
     </section>
 
@@ -168,18 +168,18 @@
     <section class="panel">
       <div class="panel-head table-head">
         <div>
-          <h2>ข้อมูลปริมาณฝนล่าสุด</h2>
-          <p class="hint">แสดงค่าล่าสุดจากทุกสถานี เรียงตามเวลาล่าสุด</p>
+          <h2 data-i18n="table.title.rain">ข้อมูลปริมาณฝนล่าสุด</h2>
+          <p class="hint" data-i18n="table.hint">แสดงค่าล่าสุดจากทุกสถานี เรียงตามเวลาล่าสุด</p>
         </div>
-        <div class="table-record-count">พบ <span id="recordCountValue" class="count-value">0</span> รายการ</div>
+        <div class="table-record-count"><span data-i18n="table.found">พบ</span> <span id="recordCountValue" class="count-value">0</span> <span data-i18n="table.items">รายการ</span></div>
         <div class="table-control">
-          <input type="text" id="tableSearch" class="table-search" placeholder="ค้นหาสถานี ตำบล หรืออำเภอ">
+          <input type="text" id="tableSearch" class="table-search" placeholder="ค้นหาสถานี ตำบล หรืออำเภอ" data-i18n-placeholder="table.search.placeholder">
           <select id="statusFilter" class="status-select">
-            <option value="">ทุกสถานะ</option>
-            <option value="normal">เล็กน้อย</option>
-            <option value="watch">ปานกลาง</option>
-            <option value="warning">หนัก</option>
-            <option value="critical">หนักมาก</option>
+            <option value="" data-i18n="table.allStatus">ทุกสถานะ</option>
+            <option value="normal" data-i18n="status.rain.normal">เล็กน้อย</option>
+            <option value="watch" data-i18n="status.rain.watch">ปานกลาง</option>
+            <option value="warning" data-i18n="status.rain.warning">หนัก</option>
+            <option value="critical" data-i18n="status.rain.critical">หนักมาก</option>
           </select>
         </div>
       </div>
@@ -188,18 +188,18 @@
         <table id="reportTable">
           <thead>
             <tr>
-              <th>สถานี</th>
-              <th>ตำบล</th>
-              <th>อำเภอ</th>
-              <th class="text-right sortable" id="sortRainfallHeader" tabindex="0" role="button" aria-label="เรียงลำดับตามปริมาณฝน">ปริมาณฝน (มม.)<span class="sort-indicator" id="sortRainfallIndicator"></span></th>
-              <th>สถานะ</th>
-              <th>เวลาข้อมูล</th>
-              <th class="text-center">กราฟ</th>
+              <th data-i18n="table.col.station">สถานี</th>
+              <th data-i18n="table.col.tambon">ตำบล</th>
+              <th data-i18n="table.col.district">อำเภอ</th>
+              <th class="text-right sortable" id="sortRainfallHeader" tabindex="0" role="button" aria-label="เรียงลำดับตามปริมาณฝน"><span data-i18n="table.col.rainfall">ปริมาณฝน (มม.)</span><span class="sort-indicator" id="sortRainfallIndicator"></span></th>
+              <th data-i18n="table.col.status">สถานะ</th>
+              <th data-i18n="table.col.time">เวลาข้อมูล</th>
+              <th class="text-center" data-i18n="table.col.chart">กราฟ</th>
             </tr>
           </thead>
           <tbody id="reportTableBody">
             <tr>
-              <td colspan="7" class="text-center muted">กำลังโหลดข้อมูล...</td>
+              <td colspan="7" class="text-center muted" data-i18n="table.loading">กำลังโหลดข้อมูล...</td>
             </tr>
           </tbody>
         </table>
@@ -215,7 +215,7 @@
         <h3 id="chartModalTitle">กราฟฝนสถานี</h3>
         <div class="chart-modal-header-actions">
           <div class="chart-download-wrap" id="chartDownloadWrap">
-            <button type="button" class="chart-download-btn" id="chartDownloadBtn" aria-haspopup="true" aria-expanded="false">⬇ ดาวน์โหลด</button>
+            <button type="button" class="chart-download-btn" id="chartDownloadBtn" aria-haspopup="true" aria-expanded="false" data-i18n="chart.download">⬇ ดาวน์โหลด</button>
             <div class="chart-download-menu" id="chartDownloadMenu">
               <button type="button" data-action="print">Print Chart</button>
               <button type="button" data-action="png">Download PNG</button>
@@ -229,36 +229,36 @@
       </div>
       <div class="chart-modal-controls">
         <div class="chart-period-field">
-          <label for="chartPeriodSelect">ประเภทข้อมูล</label>
+          <label for="chartPeriodSelect" data-i18n="chart.periodLabel">ประเภทข้อมูล</label>
           <select id="chartPeriodSelect" class="status-select">
-            <option value="rain_24h">ฝน 24 ชั่วโมง</option>
-            <option value="rain_today">ฝนวันนี้</option>
-            <option value="rain_yesterday">ฝนเมื่อวาน</option>
-            <option value="rain3d">ฝน 3 วัน</option>
-            <option value="rain5d">ฝน 5 วัน</option>
-            <option value="rain7d">ฝน 7 วัน</option>
-            <option value="rain15d">ฝน 15 วัน</option>
-            <option value="rain_monthly" selected>ฝนรายเดือน</option>
-            <option value="rain_yearly">ฝนรายปี</option>
+            <option value="rain_24h" data-i18n="chart.opt.24h">ฝน 24 ชั่วโมง</option>
+            <option value="rain_today" data-i18n="period.today">ฝนวันนี้</option>
+            <option value="rain_yesterday" data-i18n="chart.opt.yesterday">ฝนเมื่อวาน</option>
+            <option value="rain3d" data-i18n="chart.opt.3d">ฝน 3 วัน</option>
+            <option value="rain5d" data-i18n="chart.opt.5d">ฝน 5 วัน</option>
+            <option value="rain7d" data-i18n="chart.opt.7d">ฝน 7 วัน</option>
+            <option value="rain15d" data-i18n="chart.opt.15d">ฝน 15 วัน</option>
+            <option value="rain_monthly" selected data-i18n="chart.opt.monthly">ฝนรายเดือน</option>
+            <option value="rain_yearly" data-i18n="chart.opt.yearly">ฝนรายปี</option>
           </select>
         </div>
         <div class="chart-month-nav" id="chartMonthNav">
           <div class="chart-period-field">
-            <label for="chartMonthSelect">เดือน</label>
+            <label for="chartMonthSelect" data-i18n="chart.monthLabel">เดือน</label>
             <select id="chartMonthSelect" class="status-select"></select>
           </div>
         </div>
         <div class="chart-period-field" id="chartYearNav">
-          <label for="chartYearSelect">ปี</label>
+          <label for="chartYearSelect" data-i18n="chart.yearLabel">ปี</label>
           <select id="chartYearSelect" class="status-select"></select>
         </div>
         <div class="chart-date-range-nav" id="chartDateRangeNav">
           <div class="chart-period-field">
-            <label for="chartStartDate">วันที่เริ่มต้น</label>
+            <label for="chartStartDate" data-i18n="chart.startDate">วันที่เริ่มต้น</label>
             <input type="date" id="chartStartDate" class="status-select">
           </div>
           <div class="chart-period-field">
-            <label for="chartEndDate">วันที่สิ้นสุด</label>
+            <label for="chartEndDate" data-i18n="chart.endDate">วันที่สิ้นสุด</label>
             <input type="date" id="chartEndDate" class="status-select">
           </div>
         </div>
@@ -287,16 +287,17 @@
             rel="noopener">ระบบรายงานสาธารณภัยจังหวัดแม่ฮ่องสอน (อบจ.แม่ฮ่องสอน)</span></a>
         <span style="white-space: nowrap;">ผ่าน Rainfall API</span>
       </p> -->
-      <p class="footer-note">พัฒนาโดย โครงการชลประทานแม่ฮ่องสอน สำนักงานชลประทานที่ 1 กรมชลประทาน<br>
-        ข้อมูลเพื่อการเฝ้าระวัง โปรดติดตามประกาศจากหน่วยงานภาครัฐ</p>
+      <p class="footer-note"><span data-i18n="footer.developedBy">พัฒนาโดย โครงการชลประทานแม่ฮ่องสอน สำนักงานชลประทานที่ 1 กรมชลประทาน</span><br>
+        <span data-i18n="footer.disclaimer">ข้อมูลเพื่อการเฝ้าระวัง โปรดติดตามประกาศจากหน่วยงานภาครัฐ</span></p>
   </footer>
 
+  <script src="i18n.js?v=8"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="map.js?v=22"></script>
-  <script src="main.js?v=22"></script>
-  <script src="station-chart.js?v=9"></script>
+  <script src="map.js?v=24"></script>
+  <script src="main.js?v=26"></script>
+  <script src="station-chart.js?v=10"></script>
 </body>
 
 </html>

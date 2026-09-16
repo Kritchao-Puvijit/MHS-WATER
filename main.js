@@ -12,15 +12,15 @@ const THAIWATER_BASE = 'https://api-v3.thaiwater.net/api/v1/thaiwater30';
 // ชุดข้อมูลย่อยแต่ละช่วงเวลา — endpoint และชื่อ field ค่าน้ำฝนอาจไม่เหมือนกันในแต่ละ endpoint
 // (เดาจากรูปแบบทั่วไปของ API สสน. ยังไม่ยืนยัน 100% — เช็ค console log แล้วแก้ valueKeys ให้ตรงได้)
 const PERIOD_CONFIG = {
-  rain_24h: { path: '/public/rain_24h', valueKeys: ['rain_24h', 'rainfall_value', 'value'], label: '24 ชั่วโมงล่าสุด' },
-  rain_today: { path: '/public/rain_today', valueKeys: ['rain_today', 'rainfall_value', 'value'], label: 'ฝนวันนี้' },
-  rain_yesterday: { path: '/public/rain_yesterday', valueKeys: ['rain_yesterday', 'rainfall_value', 'value'], label: 'ฝนวานนี้' },
-  rain3d: { path: '/provinces/rain3d', valueKeys: ['rain_3d', 'rain3d', 'rainfall_value', 'value'], label: '3 วันย้อนหลัง' },
-  rain5d: { path: '/provinces/rain5d', valueKeys: ['rain_5d', 'rain5d', 'rainfall_value', 'value'], label: '5 วันย้อนหลัง' },
-  rain7d: { path: '/provinces/rain7d', valueKeys: ['rain_7d', 'rain7d', 'rainfall_value', 'value'], label: '7 วันย้อนหลัง' },
-  rain15d: { path: '/provinces/rain15d', valueKeys: ['rain_15d', 'rain15d', 'rainfall_value', 'value'], label: '15 วันย้อนหลัง' },
-  rain_monthly: { path: '/public/rain_monthly', valueKeys: ['rainfall_value', 'rain_month', 'rain_monthly', 'value'], label: 'รายเดือน' },
-  rain_yearly: { path: '/public/rain_yearly', valueKeys: ['rainfall_value', 'rain_year', 'rain_yearly', 'value'], label: 'รายปี' },
+  rain_24h: { path: '/public/rain_24h', valueKeys: ['rain_24h', 'rainfall_value', 'value'], label: '24 ชั่วโมงล่าสุด', labelEn: 'the latest 24 hours' },
+  rain_today: { path: '/public/rain_today', valueKeys: ['rain_today', 'rainfall_value', 'value'], label: 'ฝนวันนี้', labelEn: "today's rain" },
+  rain_yesterday: { path: '/public/rain_yesterday', valueKeys: ['rain_yesterday', 'rainfall_value', 'value'], label: 'ฝนวานนี้', labelEn: "yesterday's rain" },
+  rain3d: { path: '/provinces/rain3d', valueKeys: ['rain_3d', 'rain3d', 'rainfall_value', 'value'], label: '3 วันย้อนหลัง', labelEn: 'the last 3 days' },
+  rain5d: { path: '/provinces/rain5d', valueKeys: ['rain_5d', 'rain5d', 'rainfall_value', 'value'], label: '5 วันย้อนหลัง', labelEn: 'the last 5 days' },
+  rain7d: { path: '/provinces/rain7d', valueKeys: ['rain_7d', 'rain7d', 'rainfall_value', 'value'], label: '7 วันย้อนหลัง', labelEn: 'the last 7 days' },
+  rain15d: { path: '/provinces/rain15d', valueKeys: ['rain_15d', 'rain15d', 'rainfall_value', 'value'], label: '15 วันย้อนหลัง', labelEn: 'the last 15 days' },
+  rain_monthly: { path: '/public/rain_monthly', valueKeys: ['rainfall_value', 'rain_month', 'rain_monthly', 'value'], label: 'รายเดือน', labelEn: 'the month' },
+  rain_yearly: { path: '/public/rain_yearly', valueKeys: ['rainfall_value', 'rain_year', 'rain_yearly', 'value'], label: 'รายปี', labelEn: 'the year' },
 };
 
 let allStations = [];
@@ -79,14 +79,14 @@ function startLiveClock() {
 function startLiveDate() {
   const el = document.getElementById('liveDate');
   const tick = () => {
-    el.textContent = new Date().toLocaleDateString('th-TH', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    // th-TH ให้ปี พ.ศ. + เดือนไทยเสมอ ต้องสลับเป็น en-US เอง (ให้ปี ค.ศ. + เดือนอังกฤษ) ตอนเลือกภาษาอังกฤษ
+    el.textContent = getLang() === 'en'
+      ? new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
   };
   tick();
   setInterval(tick, 60 * 1000); // อัปเดตทุก 1 นาที
+  window.updateLiveDateNow = tick; // ให้ onLanguageChange เรียกอัปเดตทันทีตอนสลับภาษา ไม่ต้องรอ 1 นาที
 }
 
 startLiveDate();
@@ -212,8 +212,8 @@ function populateDistrictOptions(stations) {
   const current = select.value;
   const districts = [...new Set(stations.map((s) => s.district).filter((d) => d && d !== '-'))].sort();
 
-  select.innerHTML = '<option value="">ทุกอำเภอ</option>' +
-    districts.map((d) => `<option value="${d}">${d}</option>`).join('');
+  select.innerHTML = `<option value="">${t('filter.allDistrict')}</option>` +
+    districts.map((d) => `<option value="${d}">${localizeName(d)}</option>`).join('');
   if (districts.includes(current)) select.value = current;
 }
 
@@ -227,8 +227,8 @@ function populateTambonOptions(stations) {
     : stations;
   const tambons = [...new Set(scoped.map((s) => s.subDistrict).filter((t) => t && t !== '-'))].sort();
 
-  select.innerHTML = '<option value="">ทุกตำบล</option>' +
-    tambons.map((t) => `<option value="${t}">${t}</option>`).join('');
+  select.innerHTML = `<option value="">${t('filter.allTambon')}</option>` +
+    tambons.map((tb) => `<option value="${tb}">${localizeName(tb)}</option>`).join('');
   if (tambons.includes(current)) select.value = current;
   else currentTambonFilter = '';
 }
@@ -239,8 +239,8 @@ function populateAgencyOptions(stations) {
   const current = select.value;
   const agencies = [...new Set(stations.map((s) => s.agency).filter((a) => a && a !== '-'))].sort();
 
-  select.innerHTML = '<option value="">ทุกหน่วยงาน</option>' +
-    agencies.map((a) => `<option value="${a}">${a}</option>`).join('');
+  select.innerHTML = `<option value="">${t('filter.allAgency')}</option>` +
+    agencies.map((a) => `<option value="${a}">${localizeAgency(a)}</option>`).join('');
   if (agencies.includes(current)) select.value = current;
 }
 
@@ -302,14 +302,14 @@ function renderRainExtremes(filteredStations) {
     const valueEl = card.querySelector('.rain-extreme-value');
     const stationEl = card.querySelector('.rain-extreme-station');
     if (!station) {
-      valueEl.innerHTML = '- <span class="muted">มม.</span>';
-      stationEl.textContent = 'ไม่พบข้อมูล';
+      valueEl.innerHTML = `- <span class="muted">${t('unit.mm')}</span>`;
+      stationEl.textContent = t('extremes.noData');
       card.disabled = true;
       delete card.dataset.id;
       return;
     }
-    valueEl.innerHTML = `${station.rainfall.toFixed(1)} <span class="muted">มม.</span>`;
-    stationEl.textContent = `${station.name} • ${station.district}`;
+    valueEl.innerHTML = `${station.rainfall.toFixed(1)} <span class="muted">${t('unit.mm')}</span>`;
+    stationEl.textContent = `${localizeName(station.name)} • ${localizeName(station.district)}`;
     card.disabled = false;
     card.dataset.id = station.id;
   };
@@ -369,11 +369,12 @@ function renderTable() {
   if (countEl) countEl.textContent = rows.length.toLocaleString('th-TH');
 
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center muted">ไม่พบข้อมูล</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center muted">${t('table.noData')}</td></tr>`;
     return;
   }
 
-  const unit = currentPeriod === 'rain_yearly' ? 'มม./ปี' : currentPeriod === 'rain_monthly' ? 'มม./เดือน' : 'มม.';
+  const mmUnit = t('unit.mm');
+  const unit = currentPeriod === 'rain_yearly' ? `${mmUnit}/${getLang() === 'en' ? 'yr' : 'ปี'}` : currentPeriod === 'rain_monthly' ? `${mmUnit}/${getLang() === 'en' ? 'mo' : 'เดือน'}` : mmUnit;
 
   // รายเดือน/รายปี: คอลัมน์สถานะแสดงช่วงเกณฑ์ + สีตามสเกลละเอียด (js/map.js)
   const fineScale = currentFineRainScale();
@@ -384,17 +385,17 @@ function renderTable() {
       const band = classifyFineRain(s.rainfall, fineScale);
       const statusCell = band
         ? `<span class="status-badge" style="background:${band.color};color:${contrastTextColor(band.color)};">${band.label}</span>`
-        : `<span class="status-badge ${status}">${STATUS_LABEL[status]}</span>`;
+        : `<span class="status-badge ${status}">${getStatusLabel(status)}</span>`;
       return `
       <tr data-id="${s.id}" tabindex="0">
-        <td>${s.name}</td>
-        <td>${s.subDistrict}</td>
-        <td>${s.district}</td>
+        <td>${localizeName(s.name)}</td>
+        <td>${localizeName(s.subDistrict)}</td>
+        <td>${localizeName(s.district)}</td>
         <td class="text-right">${s.rainfall.toFixed(1)} <span class="muted">${unit}</span></td>
         <td>${statusCell}</td>
         <td class="muted">${s.recordedAt}</td>
         <td class="text-center">
-          <button type="button" class="chart-open-btn" data-id="${s.id}" data-name="${s.name}" title="ดูกราฟย้อนหลัง" aria-label="ดูกราฟย้อนหลัง">📈</button>
+          <button type="button" class="chart-open-btn" data-id="${s.id}" data-name="${s.name}" title="${t('popup.viewChart')}" aria-label="${t('popup.viewChart')}">📈</button>
         </td>
       </tr>`;
     })
@@ -405,7 +406,7 @@ function renderTable() {
 // periodType: 'rain_24h' | 'rain_today' | 'rain_yesterday' | 'rain3d' | 'rain5d' | 'rain7d' | 'rain15d' | 'rain_monthly' | 'rain_yearly'
 // rain3d/rain5d/rain7d/rain15d ใช้ startDate/endDate ที่ผู้ใช้เลือกเองจากช่อง "วันที่เริ่มต้น/สิ้นสุด" ใน modal (ไม่ผูกกับ N วันตายตัว)
 async function fetchStationRainChart(stationId, periodType, month, year, startDate, endDate) {
-  if (periodType === 'rain_24h') return fetchStationRainHourly(stationId, null, 'ปริมาณฝนรายชั่วโมง (24 ชม.)', 'ปริมาณฝนสะสม');
+  if (periodType === 'rain_24h') return fetchStationRainHourly(stationId, null, t('chart.rainHourly24h'), t('chart.rainAccum'));
   if (periodType === 'rain_today') return fetchStationRainToday(stationId);
   if (periodType === 'rain_yesterday') return fetchStationRainYesterdayHourly(stationId);
   if (periodType === 'rain3d' || periodType === 'rain5d' || periodType === 'rain7d' || periodType === 'rain15d') {
@@ -438,11 +439,11 @@ async function fetchStationRainMonthly(stationId, month, year) {
   const dailyValues = json.data.map((d) => (typeof d.rainfall_value === 'number' ? d.rainfall_value : 0));
 
   return {
-    unitLabel: 'ปริมาณฝน (มม.)',
+    unitLabel: t('chart.rainfallUnit'),
     labels,
     datasets: [
-      { type: 'bar', label: 'ปริมาณฝนรายวัน', data: dailyValues },
-      { type: 'line', label: 'ปริมาณฝนสะสม', data: buildCumulative(dailyValues) },
+      { type: 'bar', label: t('chart.rainDaily'), data: dailyValues },
+      { type: 'line', label: t('chart.rainAccum'), data: buildCumulative(dailyValues) },
     ],
   };
 }
@@ -458,7 +459,7 @@ async function fetchStationRainHourly(stationId, dateParam, barLabel, lineLabel)
   const values = json.data.map((d) => (typeof d.rainfall_value === 'number' ? d.rainfall_value : 0));
 
   return {
-    unitLabel: 'ปริมาณฝน (มม.)',
+    unitLabel: t('chart.rainfallUnit'),
     labels,
     datasets: [
       { type: 'bar', label: barLabel, data: values },
@@ -472,7 +473,7 @@ async function fetchStationRainYesterdayHourly(stationId) {
   const y = new Date();
   y.setDate(y.getDate() - 1);
   const dateStr = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
-  return fetchStationRainHourly(stationId, dateStr, 'ปริมาณฝนรายชั่วโมง (เมื่อวาน)', 'ปริมาณฝนสะสม');
+  return fetchStationRainHourly(stationId, dateStr, t('chart.rainHourlyYesterday'), t('chart.rainAccum'));
 }
 
 // วันนี้ (รายชั่วโมง ตั้งแต่ 00:00 ถึงตอนนี้) — /public/rain_today_graph
@@ -494,11 +495,11 @@ async function fetchStationRainToday(stationId) {
   const values = rows.map((d) => (typeof d.rainfall === 'number' ? d.rainfall : 0));
 
   return {
-    unitLabel: 'ปริมาณฝน (มม.)',
+    unitLabel: t('chart.rainfallUnit'),
     labels,
     datasets: [
-      { type: 'bar', label: 'ปริมาณฝนรายชั่วโมง (วันนี้)', data: values },
-      { type: 'line', label: 'ปริมาณฝนสะสมวันนี้', data: buildCumulative(values) },
+      { type: 'bar', label: t('chart.rainHourlyToday'), data: values },
+      { type: 'line', label: t('chart.rainAccumToday'), data: buildCumulative(values) },
     ],
   };
 }
@@ -544,11 +545,11 @@ async function fetchStationRainDateRange(stationId, startDateStr, endDateStr) {
   const values = filtered.map((d) => (typeof d.rainfall_value === 'number' ? d.rainfall_value : 0));
 
   return {
-    unitLabel: 'ปริมาณฝน (มม.)',
+    unitLabel: t('chart.rainfallUnit'),
     labels,
     datasets: [
-      { type: 'bar', label: 'ปริมาณฝนรายวัน', data: values },
-      { type: 'line', label: 'ปริมาณฝนสะสม', data: buildCumulative(values) },
+      { type: 'bar', label: t('chart.rainDaily'), data: values },
+      { type: 'line', label: t('chart.rainAccum'), data: buildCumulative(values) },
     ],
   };
 }
@@ -556,24 +557,26 @@ async function fetchStationRainDateRange(stationId, startDateStr, endDateStr) {
 // รายปี (รวมรายเดือนตลอดปี) — /public/rain_yearly_graph
 // หมายเหตุ: field name ต่างจาก endpoint อื่น (date_time/rainfall เหมือน rain_today_graph)
 const THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const EN_MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 async function fetchStationRainYearly(stationId, year) {
   const url = `${THAIWATER_BASE}/public/rain_yearly_graph?station_id=${stationId}&year=${year}`;
   const json = await fetchApi(url);
   if (json.result !== 'OK' || !Array.isArray(json.data) || !json.data.length) return null;
 
+  const monthLabels = getLang() === 'en' ? EN_MONTHS_SHORT : THAI_MONTHS_SHORT;
   const labels = json.data.map((d) => {
     const datePart = (d.date_time || '').split(' ')[0];
     const parts = datePart.split('-');
-    return parts.length === 3 ? THAI_MONTHS_SHORT[parseInt(parts[1], 10) - 1] : datePart;
+    return parts.length === 3 ? monthLabels[parseInt(parts[1], 10) - 1] : datePart;
   });
   const values = json.data.map((d) => (typeof d.rainfall === 'number' ? d.rainfall : 0));
 
   return {
-    unitLabel: 'ปริมาณฝน (มม.)',
+    unitLabel: t('chart.rainfallUnit'),
     labels,
     datasets: [
-      { type: 'bar', label: 'ปริมาณฝนรายเดือน', data: values },
-      { type: 'line', label: 'ปริมาณฝนสะสมรายปี', data: buildCumulative(values) },
+      { type: 'bar', label: t('chart.rainMonthlyBar'), data: values },
+      { type: 'line', label: t('chart.rainAccumYearly'), data: buildCumulative(values) },
     ],
   };
 }
@@ -676,13 +679,21 @@ function bindAgencyFilter() {
   });
 }
 
+function updatePeriodHint() {
+  const hint = document.getElementById('periodHint');
+  if (!hint) return;
+  const cfg = PERIOD_CONFIG[currentPeriod];
+  hint.textContent = getLang() === 'en'
+    ? `Showing data for ${cfg.labelEn} from the National Hydroinformatics Data Center (HII)`
+    : `แสดงข้อมูล ${cfg.label} จากคลังข้อมูลน้ำแห่งชาติ (สสน.)`;
+}
+
 function bindPeriodSelect() {
   const el = document.getElementById('periodSelect');
-  const hint = document.getElementById('periodHint');
   if (!el) return;
   el.addEventListener('change', async (e) => {
     currentPeriod = e.target.value;
-    if (hint) hint.textContent = `แสดงข้อมูล ${PERIOD_CONFIG[currentPeriod].label} จากคลังข้อมูลน้ำแห่งชาติ (สสน.)`;
+    updatePeriodHint();
     renderMapLegend(); // legend ขึ้นกับช่วงเวลา (รายเดือน/รายปีใช้สเกลละเอียด) จึงต้องวาดใหม่ทุกครั้ง
     await loadAll(); // เปลี่ยนช่วงเวลา = ต้องยิง endpoint ใหม่ทั้งชุด ไม่ใช่แค่ filter ข้อมูลเดิม
   });
@@ -701,3 +712,16 @@ function bindTableSearch() {
     }, 250);
   });
 }
+
+// สลับภาษา (i18n.js) เรียกฟังก์ชันนี้หลังเปลี่ยนภาษาเสร็จ — re-render ทุกจุดที่มีข้อความ
+// จากข้อมูล allStations ที่ cache ไว้แล้ว ไม่ยิง API ใหม่ (เร็วกว่ารีเฟรชทั้งหน้ามาก)
+window.onLanguageChange = function () {
+  populateDistrictOptions(allStations);
+  populateTambonOptions(allStations);
+  populateAgencyOptions(allStations);
+  updatePeriodHint();
+  renderMapLegend();
+  render();
+  if (typeof refreshMapLanguage === 'function') refreshMapLanguage(); // js/map.js — layer control + ขอบเขต popup
+  if (typeof window.updateLiveDateNow === 'function') window.updateLiveDateNow();
+};

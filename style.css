@@ -486,6 +486,39 @@ a {
 /* ============ Header nav dropdown (น้ำฝน / ระดับน้ำ) ============ */
 .header-nav {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* ============ Language toggle (TH/EN) ============ */
+.lang-toggle {
+  display: flex;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.lang-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.lang-toggle-btn:hover {
+  color: var(--text);
+}
+
+.lang-toggle-btn.active {
+  background: var(--accent);
+  color: #041018;
 }
 
 .nav-dropdown-btn {
@@ -1126,6 +1159,16 @@ body.chart-modal-active {
   color: var(--text-muted);
   text-transform: uppercase;
   margin: 0.15rem 0 0.35rem;
+}
+
+/* หัวข้อกลุ่มภาษาอังกฤษ — สลับด้วย html[lang] ที่ i18n.js อัปเดตให้ตอนสลับภาษา (ไม่มีใน markup แก้ผ่าน data-i18n ไม่ได้
+   เพราะเป็นเนื้อหาจาก CSS content: ล้วนๆ) */
+html[lang="en"] .leaflet-control-layers-base::before {
+  content: 'Base Maps';
+}
+
+html[lang="en"] .leaflet-control-layers-overlays::before {
+  content: 'Layers';
 }
 
 .leaflet-control-layers-base,

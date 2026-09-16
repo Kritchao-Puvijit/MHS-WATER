@@ -76,14 +76,14 @@ function startLiveClock() {
 function startLiveDate() {
   const el = document.getElementById('liveDate');
   const tick = () => {
-    el.textContent = new Date().toLocaleDateString('th-TH', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    // th-TH ให้ปี พ.ศ. + เดือนไทยเสมอ ต้องสลับเป็น en-US เอง (ให้ปี ค.ศ. + เดือนอังกฤษ) ตอนเลือกภาษาอังกฤษ
+    el.textContent = getLang() === 'en'
+      ? new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
   };
   tick();
   setInterval(tick, 60 * 1000); // อัปเดตทุก 1 นาที
+  window.updateLiveDateNow = tick; // ให้ onLanguageChange เรียกอัปเดตทันทีตอนสลับภาษา ไม่ต้องรอ 1 นาที
 }
 
 startLiveDate();
@@ -296,8 +296,8 @@ function populateDistrictOptions(stations) {
   const current = select.value;
   const districts = [...new Set(stations.map((s) => s.district).filter((d) => d && d !== '-'))].sort();
 
-  select.innerHTML = '<option value="">ทุกอำเภอ</option>' +
-    districts.map((d) => `<option value="${d}">${d}</option>`).join('');
+  select.innerHTML = `<option value="">${t('filter.allDistrict')}</option>` +
+    districts.map((d) => `<option value="${d}">${localizeName(d)}</option>`).join('');
   if (districts.includes(current)) select.value = current;
 }
 
@@ -307,8 +307,8 @@ function populateAgencyOptions(stations) {
   const current = select.value;
   const agencies = [...new Set(stations.map((s) => s.agency).filter((a) => a && a !== '-'))].sort();
 
-  select.innerHTML = '<option value="">ทุกหน่วยงาน</option>' +
-    agencies.map((a) => `<option value="${a}">${a}</option>`).join('');
+  select.innerHTML = `<option value="">${t('filter.allAgency')}</option>` +
+    agencies.map((a) => `<option value="${a}">${localizeAgency(a)}</option>`).join('');
   if (agencies.includes(current)) select.value = current;
 }
 
@@ -383,7 +383,7 @@ function renderTable() {
   }
 
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center muted">ไม่พบข้อมูล</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center muted">${t('table.noData')}</td></tr>`;
     return;
   }
 
@@ -394,15 +394,15 @@ function renderTable() {
       const percentText = !isNaN(s.storagePercent) ? `${s.storagePercent.toFixed(1)} <span class="muted">%</span>` : '-';
       return `
       <tr data-id="${s.id}" tabindex="0">
-        <td>${s.name}</td>
-        <td>${s.subDistrict}</td>
-        <td>${s.district}</td>
+        <td>${localizeName(s.name)}</td>
+        <td>${localizeName(s.subDistrict)}</td>
+        <td>${localizeName(s.district)}</td>
         <td class="text-right">${levelText}</td>
         <td class="text-right">${percentText}</td>
-        <td><span class="status-badge ${status}">${STATUS_LABEL[status]}</span></td>
+        <td><span class="status-badge ${status}">${getStatusLabel(status)}</span></td>
         <td class="muted">${s.recordedAt}</td>
         <td class="text-center">
-          <button type="button" class="chart-open-btn" data-id="${s.id}" data-name="${s.name}" title="ดูกราฟย้อนหลัง" aria-label="ดูกราฟย้อนหลัง">📈</button>
+          <button type="button" class="chart-open-btn" data-id="${s.id}" data-name="${s.name}" title="${t('popup.viewChart')}" aria-label="${t('popup.viewChart')}">📈</button>
         </td>
       </tr>`;
     })
@@ -529,7 +529,7 @@ async function fetchStationWaterLevelChart(stationId, periodType, month, year, s
   const datasets = [
     {
       type: 'line',
-      label: 'ระดับน้ำ',
+      label: t('chart.waterlevel'),
       data: values,
       showLine: false,
       pointRadius: 4,
@@ -546,7 +546,7 @@ async function fetchStationWaterLevelChart(stationId, periodType, month, year, s
   if (bankLevel != null && !isNaN(bankLevel)) {
     datasets.push({
       type: 'line',
-      label: `ระดับตลิ่ง${ridOverride ? '' : 'ต่ำสุด'} ${bankLevel.toFixed(2)} ม.รทก.`,
+      label: `${ridOverride ? t('chart.bankLevel') : t('chart.bankLevelMin')} ${bankLevel.toFixed(2)} ม.รทก.`,
       data: values.map(() => bankLevel),
       borderColor: '#F87171', // แดง ตรงกับ --critical ในธีมเว็บ
       backgroundColor: '#F87171',
@@ -566,7 +566,7 @@ async function fetchStationWaterLevelChart(stationId, periodType, month, year, s
     );
     datasets.push({
       type: 'line',
-      label: 'ความจุลำน้ำ (%)',
+      label: t('chart.capacityPercent'),
       data: percentValues,
       yAxisID: 'y1',
       unitSuffix: '%',
@@ -580,9 +580,9 @@ async function fetchStationWaterLevelChart(stationId, periodType, month, year, s
   }
 
   return {
-    unitLabel: 'ระดับน้ำ (ม.รทก.)',
+    unitLabel: `${t('chart.waterlevel')} (ม.รทก.)`,
     unitSuffix: 'ม.รทก.',
-    y1Label: ridOverride ? 'ความจุลำน้ำ (%)' : undefined,
+    y1Label: ridOverride ? t('chart.capacityPercent') : undefined,
     rawTimestamps,
     labels,
     datasets,
@@ -690,3 +690,14 @@ function bindTableSearch() {
     }, 250);
   });
 }
+
+// สลับภาษา (i18n.js) เรียกฟังก์ชันนี้หลังเปลี่ยนภาษาเสร็จ — re-render ทุกจุดที่มีข้อความ
+// จากข้อมูล allStations ที่ cache ไว้แล้ว ไม่ยิง API ใหม่ (เร็วกว่ารีเฟรชทั้งหน้ามาก)
+window.onLanguageChange = function () {
+  populateDistrictOptions(allStations);
+  populateAgencyOptions(allStations);
+  renderMapLegend();
+  render();
+  if (typeof refreshMapLanguage === 'function') refreshMapLanguage(); // js/waterlevel-map.js — layer control + ขอบเขต popup
+  if (typeof window.updateLiveDateNow === 'function') window.updateLiveDateNow();
+};

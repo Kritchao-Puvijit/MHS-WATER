@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Sarabun:wght@400;500;600&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 
   <!-- ICON For Add to Home Screen -->
   <link rel="manifest" href="manifest.webmanifest">
@@ -37,7 +37,7 @@
         <!-- <div class="brand-mark">MH</div> -->
         <div class="brand-text">
           <h1>MHS Water</h1>
-          <p>ระบบเฝ้าระวังและติดตามระดับน้ำ <span style="white-space: nowrap;">จังหวัดแม่ฮ่องสอน</span></p>
+          <p><span data-i18n="brand.subtitle.water">ระบบเฝ้าระวังและติดตามระดับน้ำ</span> <span data-i18n="hero.line2" style="white-space: nowrap;">จังหวัดแม่ฮ่องสอน</span></p>
         </div>
       </div>
 
@@ -45,12 +45,12 @@
       <nav class="header-nav">
         <div class="nav-dropdown" id="navDropdown">
           <button class="nav-dropdown-btn" id="navDropdownBtn" type="button">
-            <span id="navCurrentLabel">ระดับน้ำ</span>
+            <span id="navCurrentLabel" data-i18n="nav.waterlevel">ระดับน้ำ</span>
             <span class="nav-caret">▾</span>
           </button>
           <ul class="nav-dropdown-menu" id="navDropdownMenu">
-            <li><a href="index.html">น้ำฝน</a></li>
-            <li><a href="waterlevel.html" class="active">ระดับน้ำ</a></li>
+            <li><a href="index.html" data-i18n="nav.rain">น้ำฝน</a></li>
+            <li><a href="waterlevel.html" class="active" data-i18n="nav.waterlevel">ระดับน้ำ</a></li>
           </ul>
         </div>
       </nav>
@@ -61,12 +61,12 @@
     <section class="hero">
       <div>
         <p class="eyebrow">MAE HONG SON <span style="white-space: nowrap;">WATER LEVEL MONITORING</span></p>
-        <h2><strong>รายงานสถานการณ์<span style="white-space: nowrap;">ระดับน้ำ</span><br>
-            <span><strong>จังหวัดแม่ฮ่องสอน</strong></span></h2>
-        <p class="eyebrow"><small>ข้อมูลระดับน้ำจากคลังข้อมูลน้ำแห่งชาติ (สสน.)</small></p>
+        <h2><strong><span data-i18n="hero.line1.water">รายงานสถานการณ์</span><span data-i18n="hero.line1b.water" style="white-space: nowrap;">ระดับน้ำ</span><br>
+            <span><strong data-i18n="hero.line2">จังหวัดแม่ฮ่องสอน</strong></span></h2>
+        <p class="eyebrow"><small data-i18n="hero.source.water">ข้อมูลระดับน้ำจากคลังข้อมูลน้ำแห่งชาติ (สสน.)</small></p>
       </div>
       <div class="header-clock">
-        <span class="clock-label">เวลาปัจจุบัน</span>
+        <span class="clock-label" data-i18n="clock.label">เวลาปัจจุบัน</span>
         <span id="liveClock" class="clock-value">--:--:--</span>
         <span id="liveDate" class="date-value">กำลังโหลดวันที่...</span>
       </div>
@@ -76,32 +76,32 @@
     <section class="status-bar" id="statusBar">
       <div class="status-pill">
         <span class="dot dot-total"></span>
-        <span class="pill-label">สถานีทั้งหมด</span>
+        <span class="pill-label" data-i18n="status.total">สถานีทั้งหมด</span>
         <span class="pill-count" id="countTotal">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-critical-low"></span>
-        <span class="pill-label">น้อยวิกฤต</span>
+        <span class="pill-label" data-i18n="status.water.criticalLow">น้อยวิกฤต</span>
         <span class="pill-count" id="countCriticalLow">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-low"></span>
-        <span class="pill-label">น้อย</span>
+        <span class="pill-label" data-i18n="status.water.low">น้อย</span>
         <span class="pill-count" id="countLow">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-normal"></span>
-        <span class="pill-label">ปกติ</span>
+        <span class="pill-label" data-i18n="status.water.normal">ปกติ</span>
         <span class="pill-count" id="countNormal">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-high"></span>
-        <span class="pill-label">มาก</span>
+        <span class="pill-label" data-i18n="status.water.high">มาก</span>
         <span class="pill-count" id="countHigh">0</span>
       </div>
       <div class="status-pill">
         <span class="dot dot-overflow"></span>
-        <span class="pill-label">ล้นตลิ่ง</span>
+        <span class="pill-label" data-i18n="status.water.overflow">ล้นตลิ่ง</span>
         <span class="pill-count" id="countOverflow">0</span>
       </div>
     </section>
@@ -109,8 +109,8 @@
     <!-- ============ MAP ============ -->
     <section class="panel">
       <div class="panel-head">
-        <h2>แผนที่แสดงระดับน้ำ</h2>
-        <p class="hint">คลิกจุดสถานีเพื่อดูรายละเอียด</p>
+        <h2 data-i18n="map.title.water">แผนที่แสดงระดับน้ำ</h2>
+        <p class="hint" data-i18n="map.hint">คลิกจุดสถานีเพื่อดูรายละเอียด</p>
       </div>
       <div id="map"></div>
       <div class="legend" id="mapLegend"></div>
@@ -120,15 +120,15 @@
     <section class="panel period-panel">
       <div class="period-row">
         <div class="period-field">
-          <label for="districtSelect">อำเภอ</label>
+          <label for="districtSelect" data-i18n="filter.district">อำเภอ</label>
           <select id="districtSelect" class="status-select">
-            <option value="">ทุกอำเภอ</option>
+            <option value="" data-i18n="filter.allDistrict">ทุกอำเภอ</option>
           </select>
         </div>
         <div class="period-field">
-          <label for="agencySelect">หน่วยงาน</label>
+          <label for="agencySelect" data-i18n="filter.agency">หน่วยงาน</label>
           <select id="agencySelect" class="status-select">
-            <option value="">ทุกหน่วยงาน</option>
+            <option value="" data-i18n="filter.allAgency">ทุกหน่วยงาน</option>
           </select>
         </div>
       </div>
@@ -138,18 +138,18 @@
     <section class="panel">
       <div class="panel-head table-head">
         <div>
-          <h2>ข้อมูลระดับน้ำล่าสุด</h2>
-          <p class="hint">แสดงค่าล่าสุดจากทุกสถานี เรียงตามเวลาล่าสุด</p>
+          <h2 data-i18n="table.title.water">ข้อมูลระดับน้ำล่าสุด</h2>
+          <p class="hint" data-i18n="table.hint">แสดงค่าล่าสุดจากทุกสถานี เรียงตามเวลาล่าสุด</p>
         </div>
         <div class="table-control">
-          <input type="text" id="tableSearch" class="table-search" placeholder="ค้นหาสถานี ตำบล หรืออำเภอ">
+          <input type="text" id="tableSearch" class="table-search" placeholder="ค้นหาสถานี ตำบล หรืออำเภอ" data-i18n-placeholder="table.search.placeholder">
           <select id="statusFilter" class="status-select">
-            <option value="">ทุกสถานะ</option>
-            <option value="critical_low">น้อยวิกฤต</option>
-            <option value="low">น้อย</option>
-            <option value="normal">ปกติ</option>
-            <option value="high">มาก</option>
-            <option value="overflow">ล้นตลิ่ง</option>
+            <option value="" data-i18n="table.allStatus">ทุกสถานะ</option>
+            <option value="critical_low" data-i18n="status.water.criticalLow">น้อยวิกฤต</option>
+            <option value="low" data-i18n="status.water.low">น้อย</option>
+            <option value="normal" data-i18n="status.water.normal">ปกติ</option>
+            <option value="high" data-i18n="status.water.high">มาก</option>
+            <option value="overflow" data-i18n="status.water.overflow">ล้นตลิ่ง</option>
           </select>
         </div>
       </div>
@@ -158,19 +158,19 @@
         <table id="reportTable">
           <thead>
             <tr>
-              <th>สถานี</th>
-              <th>ตำบล</th>
-              <th>อำเภอ</th>
-              <th class="text-right sortable" id="sortWaterlevelHeader" tabindex="0" role="button" aria-label="เรียงลำดับตามระดับน้ำ">ระดับน้ำ (ม.)<span class="sort-indicator" id="sortWaterlevelIndicator"></span></th>
-              <th class="text-right">ความจุลำน้ำ (%)</th>
-              <th>สถานะ</th>
-              <th>เวลาข้อมูล</th>
-              <th class="text-center">กราฟ</th>
+              <th data-i18n="table.col.station">สถานี</th>
+              <th data-i18n="table.col.tambon">ตำบล</th>
+              <th data-i18n="table.col.district">อำเภอ</th>
+              <th class="text-right sortable" id="sortWaterlevelHeader" tabindex="0" role="button" aria-label="เรียงลำดับตามระดับน้ำ"><span data-i18n="table.col.waterlevel">ระดับน้ำ (ม.)</span><span class="sort-indicator" id="sortWaterlevelIndicator"></span></th>
+              <th class="text-right" data-i18n="table.col.capacity">ความจุลำน้ำ (%)</th>
+              <th data-i18n="table.col.status">สถานะ</th>
+              <th data-i18n="table.col.time">เวลาข้อมูล</th>
+              <th class="text-center" data-i18n="table.col.chart">กราฟ</th>
             </tr>
           </thead>
           <tbody id="reportTableBody">
             <tr>
-              <td colspan="8" class="text-center muted">กำลังโหลดข้อมูล...</td>
+              <td colspan="8" class="text-center muted" data-i18n="table.loading">กำลังโหลดข้อมูล...</td>
             </tr>
           </tbody>
         </table>
@@ -186,7 +186,7 @@
         <h3 id="chartModalTitle">กราฟระดับน้ำสถานี</h3>
         <div class="chart-modal-header-actions">
           <div class="chart-download-wrap" id="chartDownloadWrap">
-            <button type="button" class="chart-download-btn" id="chartDownloadBtn" aria-haspopup="true" aria-expanded="false">⬇ ดาวน์โหลด</button>
+            <button type="button" class="chart-download-btn" id="chartDownloadBtn" aria-haspopup="true" aria-expanded="false" data-i18n="chart.download">⬇ ดาวน์โหลด</button>
             <div class="chart-download-menu" id="chartDownloadMenu">
               <button type="button" data-action="print">Print Chart</button>
               <button type="button" data-action="png">Download PNG</button>
@@ -201,11 +201,11 @@
       <div class="chart-modal-controls">
         <div class="chart-date-range-nav" id="chartDateRangeNav">
           <div class="chart-period-field">
-            <label for="chartStartDate">วันที่เริ่มต้น</label>
+            <label for="chartStartDate" data-i18n="chart.startDate">วันที่เริ่มต้น</label>
             <input type="date" id="chartStartDate" class="status-select">
           </div>
           <div class="chart-period-field">
-            <label for="chartEndDate">วันที่สิ้นสุด</label>
+            <label for="chartEndDate" data-i18n="chart.endDate">วันที่สิ้นสุด</label>
             <input type="date" id="chartEndDate" class="status-select">
           </div>
         </div>
@@ -234,17 +234,18 @@
             rel="noopener">ระบบรายงานสาธารณภัยจังหวัดแม่ฮ่องสอน (อบจ.แม่ฮ่องสอน)</span></a>
         <span style="white-space: nowrap;">ผ่าน Rainfall API</span>
       </p> -->
-      <p class="footer-note">พัฒนาโดย โครงการชลประทานแม่ฮ่องสอน สำนักงานชลประทานที่ 1 กรมชลประทาน<br>
-        ข้อมูลเพื่อการเฝ้าระวัง โปรดติดตามประกาศจากหน่วยงานภาครัฐ</p>
+      <p class="footer-note"><span data-i18n="footer.developedBy">พัฒนาโดย โครงการชลประทานแม่ฮ่องสอน สำนักงานชลประทานที่ 1 กรมชลประทาน</span><br>
+        <span data-i18n="footer.disclaimer">ข้อมูลเพื่อการเฝ้าระวัง โปรดติดตามประกาศจากหน่วยงานภาครัฐ</span></p>
   </footer>
 
 
+  <script src="i18n.js?v=8"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="waterlevel-map.js?v=3"></script>
-  <script src="waterlevel-main.js?v=7"></script>
-  <script src="station-chart.js?v=9"></script>
+  <script src="waterlevel-map.js?v=5"></script>
+  <script src="waterlevel-main.js?v=10"></script>
+  <script src="station-chart.js?v=10"></script>
 </body>
 
 </html>

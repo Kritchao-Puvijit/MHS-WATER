@@ -46,14 +46,18 @@ const STATUS_COLOR = {
   unknown: '#5B6B84',
 };
 
-const STATUS_LABEL = {
-  critical_low: 'น้อยวิกฤต',
-  low: 'น้อย',
-  normal: 'ปกติ',
-  high: 'มาก',
-  overflow: 'ล้นตลิ่ง',
-  unknown: 'ไม่มีข้อมูล',
-};
+// แปลตาม getLang() (จาก i18n.js) — ใช้ getStatusLabel(status) แทนการอ้าง object ตรงๆ
+function getStatusLabel(status) {
+  const keys = {
+    critical_low: 'status.water.criticalLow',
+    low: 'status.water.low',
+    normal: 'status.water.normal',
+    high: 'status.water.high',
+    overflow: 'status.water.overflow',
+    unknown: 'status.unknown',
+  };
+  return t(keys[status] || 'status.unknown');
+}
 
 function initMap() {
   map = L.map('map', { zoomControl: true, attributionControl: false })
@@ -66,10 +70,10 @@ function initMap() {
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
         const button = L.DomUtil.create('a', 'gps-control', container);
         button.href = '#';
-        button.title = 'ตำแหน่งปัจจุบัน';
+        button.title = t('gps.title');
         button.innerHTML = '⌖';
         button.setAttribute('role', 'button');
-        button.setAttribute('aria-label', 'ตำแหน่งปัจจุบัน');
+        button.setAttribute('aria-label', t('gps.title'));
         L.DomEvent.disableClickPropagation(container);
         L.DomEvent.on(button, 'click', function (e) {
           L.DomEvent.preventDefault(e);
@@ -161,10 +165,10 @@ function initMap() {
       const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-fullscreen');
       const link = L.DomUtil.create('a', 'fullscreen-icon', container);
       link.href = '#';
-      link.title = 'ขยายแผนที่เต็มจอ';
+      link.title = t('fullscreen.enter');
       link.innerHTML = '⛶';
       link.setAttribute('role', 'button');
-      link.setAttribute('aria-label', 'สลับโหมดเต็มจอ');
+      link.setAttribute('aria-label', t('fullscreen.toggle'));
 
       const togglePseudoFullscreen = () => {
         const mapEl = mapInstance.getContainer();
@@ -173,7 +177,7 @@ function initMap() {
         setTimeout(() => mapInstance.invalidateSize(), 100);
         const isActive = mapEl.classList.contains('pseudo-fullscreen');
         link.innerHTML = isActive ? '✕' : '⛶';
-        link.title = isActive ? 'ออกจากเต็มจอ' : 'ขยายแผนที่เต็มจอ';
+        link.title = isActive ? t('fullscreen.exit') : t('fullscreen.enter');
 
         toggleTableInFullscreen(isActive); // ย้ายตารางข้อมูล เข้า/ออกมุมขวาล่าง
         toggleLegendInFullscreen(isActive); // ย้าย legend (คำอธิบายเกณฑ์ความจุลำน้ำ) เข้า/ออกมุมซ้ายล่าง
@@ -221,9 +225,9 @@ function initMap() {
   });
 
   const baseMaps = {
-    'แผนที่ถนน': osmLayer,
-    'ภาพถ่ายดาวเทียม': satelliteLayer,
-    'แผนที่ภูมิประเทศ': terrainLayer
+    [t('layer.roadmap')]: osmLayer,
+    [t('layer.satellite')]: satelliteLayer,
+    [t('layer.terrain')]: terrainLayer
   };
 
   layerControl = L.control.layers(baseMaps, {}, { collapsed: true }).addTo(map);
@@ -260,7 +264,7 @@ function initMap() {
   map.getPane('stationPane').style.zIndex = 550;
 
   stationLayer = L.layerGroup().addTo(map);
-  layerControl.addOverlay(stationLayer, 'สถานีตรวจวัดระดับน้ำ');
+  layerControl.addOverlay(stationLayer, t('layer.waterStations'));
 
   loadBoundaryLayers();
   renderMapLegend();
@@ -280,19 +284,22 @@ async function loadBoundaryLayers() {
       style: districtStyle,
       onEachFeature: (feature, layer) => {
         const p = feature.properties;
-        const districtName = p.ADM2_TH || 'ไม่ระบุ';
-        const pcode = p.ADM2_PCODE || '-';
+        // ไฟล์นี้มีชื่ออังกฤษทางการอยู่แล้ว (ADM2_EN จากมาตรฐาน HDX) ใช้ตรงๆ แม่นยำกว่าทับศัพท์เอง
+        const districtName = getLang() === 'en'
+          ? (p.ADM2_EN || localizeName(p.ADM2_TH) || 'Unknown')
+          : (p.ADM2_TH || 'ไม่ระบุ');
+        const prefix = getLang() === 'en' ? '' : 'อำเภอ';
 
         layer.bindPopup(`
           <div style="font-family: var(--font-body); padding: 2px;">
             <div style="font-size: 1.05rem; font-weight: 600; color: #38BDF8; margin-bottom: 4px;">
-              อำเภอ${districtName}
+              ${prefix}${districtName}
             </div>
           </div>
         `);
       }
     });
-    layerControl.addOverlay(districtLayer, 'ขอบเขตอำเภอ');
+    layerControl.addOverlay(districtLayer, t('layer.district'));
 
     const resTambon = await fetch('mhs_tambon.geojson');
     const dataTambon = await resTambon.json();
@@ -301,8 +308,9 @@ async function loadBoundaryLayers() {
       style: tambonStyle,
       onEachFeature: (feature, layer) => {
         const p = feature.properties;
-        const tambonName = p.TAM_NAM_T || 'ไม่ระบุ';
-        const amphoeName = p.AMP_NAM_T || 'ไม่ระบุ';
+        const tambonName = localizeName(p.TAM_NAM_T) || (getLang() === 'en' ? 'Unknown' : 'ไม่ระบุ');
+        const amphoeName = localizeName(p.AMP_NAM_T) || (getLang() === 'en' ? 'Unknown' : 'ไม่ระบุ');
+        const belongLabel = getLang() === 'en' ? 'District' : 'สังกัด';
 
         layer.bindPopup(`
           <div style="font-family: var(--font-body); padding: 2px;">
@@ -310,13 +318,13 @@ async function loadBoundaryLayers() {
               ${tambonName}
             </div>
             <div style="font-size: 0.85rem; color: #E7ECF3;">
-              สังกัด: ${amphoeName}
+              ${belongLabel}: ${amphoeName}
             </div>
           </div>
         `);
       }
     });
-    layerControl.addOverlay(subdistrictLayer, 'ขอบเขตตำบล');
+    layerControl.addOverlay(subdistrictLayer, t('layer.tambon'));
 
     const resVillage = await fetch('mhs_village.geojson');
     const dataVillage = await resVillage.json();
@@ -325,10 +333,10 @@ async function loadBoundaryLayers() {
       style: villageStyle,
       onEachFeature: (feature, layer) => {
         const p = feature.properties;
-        const villName = p.Name || 'ไม่ระบุ';
-        const moo = p.MOO_1 ? `หมู่ที่ ${p.MOO_1}` : '';
-        const tambon = p.TAMBON_T || '';
-        const amphoe = p.AMPHOE_T || '';
+        const villName = localizeName(p.Name) || (getLang() === 'en' ? 'Unknown' : 'ไม่ระบุ');
+        const moo = p.MOO_1 ? (getLang() === 'en' ? `Moo ${p.MOO_1}` : `หมู่ที่ ${p.MOO_1}`) : '';
+        const tambon = localizeName(p.TAMBON_T) || '';
+        const amphoe = localizeName(p.AMPHOE_T) || '';
 
         layer.bindPopup(`
           <div style="font-family: var(--font-body); padding: 2px;">
@@ -342,7 +350,7 @@ async function loadBoundaryLayers() {
         `);
       }
     });
-    layerControl.addOverlay(villageLayer, 'ขอบเขตหมู่บ้าน');
+    layerControl.addOverlay(villageLayer, t('layer.village'));
 
     districtLayer.addTo(map);
     if (stationLayer) stationLayer.bringToFront();
@@ -378,22 +386,22 @@ function renderStationMarkers(stations) {
     const levelText = formatNumber(s.waterlevel, 2, ' ม.รทก.');
     const percentText = formatNumber(s.storagePercent, 1, ' %');
     const bankText = formatNumber(s.minBank, 2, ' ม.รทก.');
-    const riverLine = s.riverName && s.riverName !== '-' ? `แม่น้ำ/ลำน้ำ: ${s.riverName}<br>` : '';
+    const riverLine = s.riverName && s.riverName !== '-' ? `${t('popup.river')}: ${localizeName(s.riverName)}<br>` : '';
     const bankDiffLine = s.diffBankText && s.diffBankText !== '-'
       ? `${s.diffBankText}: ${formatNumber(s.diffBank, 2, ' ม.')}<br>`
       : '';
 
     marker.bindPopup(`
-      <strong>${s.name}</strong><br>
-      ตำบล${s.subDistrict || '-'}<br>
-      อำเภอ${s.district || '-'}<br>
+      <strong>${localizeName(s.name)}</strong><br>
+      ${t('popup.tambon')} ${localizeName(s.subDistrict) || '-'}<br>
+      ${t('popup.district')} ${localizeName(s.district) || '-'}<br>
       ${riverLine}
-      ระดับน้ำ: ${levelText}<br>
-      ความจุลำน้ำ: ${percentText}<br>
-      ตลิ่งต่ำสุด: ${bankText}<br>
+      ${t('popup.waterlevel')}: ${levelText}<br>
+      ${t('popup.capacity')}: ${percentText}<br>
+      ${t('chart.bankLevelMin')}: ${bankText}<br>
       ${bankDiffLine}
-      สถานะ: <span style="color:${color}; font-weight:600;">${STATUS_LABEL[status]}</span><br>
-      <button type="button" class="popup-chart-btn" data-id="${s.id}" data-name="${s.name}">📈 ดูกราฟย้อนหลัง</button>
+      ${t('popup.status')}: <span style="color:${color}; font-weight:600;">${getStatusLabel(status)}</span><br>
+      <button type="button" class="popup-chart-btn" data-id="${s.id}" data-name="${s.name}">${t('popup.viewChart')}</button>
     `);
 
     const supportsHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
@@ -441,11 +449,11 @@ function focusStationOnMap(id) {
 
 function renderMapLegend() {
   const items = [
-    { label: `น้อยวิกฤต (≤${WATERLEVEL_THRESHOLDS.criticalLow}%)`, color: STATUS_COLOR.critical_low },
-    { label: `น้อย (>${WATERLEVEL_THRESHOLDS.criticalLow}–${WATERLEVEL_THRESHOLDS.low}%)`, color: STATUS_COLOR.low },
-    { label: `ปกติ (>${WATERLEVEL_THRESHOLDS.low}–${WATERLEVEL_THRESHOLDS.normal}%)`, color: STATUS_COLOR.normal },
-    { label: `มาก (>${WATERLEVEL_THRESHOLDS.normal}–${WATERLEVEL_THRESHOLDS.high}%)`, color: STATUS_COLOR.high },
-    { label: `ล้นตลิ่ง (>${WATERLEVEL_THRESHOLDS.high}%)`, color: STATUS_COLOR.overflow },
+    { label: `${t('status.water.criticalLow')} (≤${WATERLEVEL_THRESHOLDS.criticalLow}%)`, color: STATUS_COLOR.critical_low },
+    { label: `${t('status.water.low')} (>${WATERLEVEL_THRESHOLDS.criticalLow}–${WATERLEVEL_THRESHOLDS.low}%)`, color: STATUS_COLOR.low },
+    { label: `${t('status.water.normal')} (>${WATERLEVEL_THRESHOLDS.low}–${WATERLEVEL_THRESHOLDS.normal}%)`, color: STATUS_COLOR.normal },
+    { label: `${t('status.water.high')} (>${WATERLEVEL_THRESHOLDS.normal}–${WATERLEVEL_THRESHOLDS.high}%)`, color: STATUS_COLOR.high },
+    { label: `${t('status.water.overflow')} (>${WATERLEVEL_THRESHOLDS.high}%)`, color: STATUS_COLOR.overflow },
   ];
 
   document.getElementById('mapLegend').innerHTML = items
@@ -475,8 +483,8 @@ function setLegendCollapsed(collapsed) {
   legendCollapsed = collapsed;
   if (legendToggleContentEl) legendToggleContentEl.style.display = collapsed ? 'none' : 'block';
   if (legendToggleBtn) {
-    legendToggleBtn.innerHTML = collapsed ? '▾ คำอธิบายสัญลักษณ์' : '▴ คำอธิบายสัญลักษณ์';
-    legendToggleBtn.title = collapsed ? 'แสดงคำอธิบายสัญลักษณ์' : 'ยุบคำอธิบายสัญลักษณ์';
+    legendToggleBtn.innerHTML = `${collapsed ? '▾' : '▴'} ${t('legend.label')}`;
+    legendToggleBtn.title = collapsed ? t('legend.show') : t('legend.hide');
   }
 }
 
@@ -510,9 +518,9 @@ function createLegendToggleControl() {
 
       const btn = L.DomUtil.create('button', 'legend-toggle-btn', container);
       btn.type = 'button';
-      btn.innerHTML = '▴ คำอธิบายสัญลักษณ์';
-      btn.title = 'ยุบคำอธิบายสัญลักษณ์';
-      btn.setAttribute('aria-label', 'ยุบ/แสดงคำอธิบายสัญลักษณ์');
+      btn.innerHTML = `▴ ${t('legend.label')}`;
+      btn.title = t('legend.hide');
+      btn.setAttribute('aria-label', t('legend.toggleAria'));
 
       const content = L.DomUtil.create('div', 'legend-toggle-content', container);
 
@@ -548,8 +556,8 @@ function setTableCollapsed(collapsed) {
   tableCollapsed = collapsed;
   if (tablePanelEl) tablePanelEl.style.display = collapsed ? 'none' : 'block';
   if (tableToggleBtn) {
-    tableToggleBtn.innerHTML = collapsed ? '▾ ตารางข้อมูล' : '▴ ตารางข้อมูล';
-    tableToggleBtn.title = collapsed ? 'แสดงตารางข้อมูล' : 'ยุบตารางข้อมูล';
+    tableToggleBtn.innerHTML = `${collapsed ? '▾' : '▴'} ${t('tablePanel.label')}`;
+    tableToggleBtn.title = collapsed ? t('tablePanel.show') : t('tablePanel.hide');
   }
 }
 
@@ -581,9 +589,9 @@ function createTableToggleControl() {
 
       const btn = L.DomUtil.create('button', 'table-toggle-btn', container);
       btn.type = 'button';
-      btn.innerHTML = '▴ ตารางข้อมูล';
-      btn.title = 'ยุบตารางข้อมูล';
-      btn.setAttribute('aria-label', 'ยุบ/แสดงตารางข้อมูล');
+      btn.innerHTML = `▴ ${t('tablePanel.label')}`;
+      btn.title = t('tablePanel.hide');
+      btn.setAttribute('aria-label', t('tablePanel.toggleAria'));
 
       const panel = L.DomUtil.create('div', 'table-panel', container);
 
@@ -601,4 +609,82 @@ function createTableToggleControl() {
   });
 
   map.addControl(new TableToggleControl());
+}
+
+// ==========================================
+// เรียกจาก window.onLanguageChange (waterlevel-main.js) ตอนสลับภาษาแบบไม่รีเฟรชหน้า
+// อัปเดต label ใน Leaflet layer control + popup ขอบเขตอำเภอ/ตำบล/หมู่บ้าน โดยไม่ fetch/parse geojson ซ้ำ
+// ==========================================
+function refreshLayerControlLabels() {
+  const baseLabels = [t('layer.roadmap'), t('layer.satellite'), t('layer.terrain')];
+  const overlayLabels = [t('layer.waterStations'), t('layer.district'), t('layer.tambon'), t('layer.village')];
+  document.querySelectorAll('.leaflet-control-layers-base label span span').forEach((span, i) => {
+    if (baseLabels[i] !== undefined) span.textContent = ` ${baseLabels[i]}`;
+  });
+  document.querySelectorAll('.leaflet-control-layers-overlays label span span').forEach((span, i) => {
+    if (overlayLabels[i] !== undefined) span.textContent = ` ${overlayLabels[i]}`;
+  });
+}
+
+function refreshBoundaryPopups() {
+  if (districtLayer) {
+    districtLayer.eachLayer((layer) => {
+      const p = layer.feature.properties;
+      const districtName = getLang() === 'en'
+        ? (p.ADM2_EN || localizeName(p.ADM2_TH) || 'Unknown')
+        : (p.ADM2_TH || 'ไม่ระบุ');
+      const prefix = getLang() === 'en' ? '' : 'อำเภอ';
+      layer.setPopupContent(`
+        <div style="font-family: var(--font-body); padding: 2px;">
+          <div style="font-size: 1.05rem; font-weight: 600; color: #38BDF8; margin-bottom: 4px;">
+            ${prefix}${districtName}
+          </div>
+        </div>
+      `);
+    });
+  }
+  if (subdistrictLayer) {
+    subdistrictLayer.eachLayer((layer) => {
+      const p = layer.feature.properties;
+      const tambonName = localizeName(p.TAM_NAM_T) || (getLang() === 'en' ? 'Unknown' : 'ไม่ระบุ');
+      const amphoeName = localizeName(p.AMP_NAM_T) || (getLang() === 'en' ? 'Unknown' : 'ไม่ระบุ');
+      const belongLabel = getLang() === 'en' ? 'District' : 'สังกัด';
+      layer.setPopupContent(`
+        <div style="font-family: var(--font-body); padding: 2px;">
+          <div style="font-size: 1rem; font-weight: 600; color: #FBBF24; margin-bottom: 4px;">
+            ${tambonName}
+          </div>
+          <div style="font-size: 0.85rem; color: #E7ECF3;">
+            ${belongLabel}: ${amphoeName}
+          </div>
+        </div>
+      `);
+    });
+  }
+  if (villageLayer) {
+    villageLayer.eachLayer((layer) => {
+      const p = layer.feature.properties;
+      const villName = localizeName(p.Name) || (getLang() === 'en' ? 'Unknown' : 'ไม่ระบุ');
+      const moo = p.MOO_1 ? (getLang() === 'en' ? `Moo ${p.MOO_1}` : `หมู่ที่ ${p.MOO_1}`) : '';
+      const tambon = localizeName(p.TAMBON_T) || '';
+      const amphoe = localizeName(p.AMPHOE_T) || '';
+      layer.setPopupContent(`
+        <div style="font-family: var(--font-body); padding: 2px;">
+          <div style="font-size: 0.95rem; font-weight: 600; color: #A855F7; margin-bottom: 4px;">
+            ${villName} ${moo}
+          </div>
+          <div style="font-size: 0.85rem; color: #8A97AC;">
+            ${tambon} ${amphoe}
+          </div>
+        </div>
+      `);
+    });
+  }
+}
+
+function refreshMapLanguage() {
+  refreshLayerControlLabels();
+  refreshBoundaryPopups();
+  setLegendCollapsed(legendCollapsed);
+  setTableCollapsed(tableCollapsed);
 }
