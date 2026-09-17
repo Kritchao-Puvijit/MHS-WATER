@@ -87,7 +87,7 @@ function initMap() {
 
   function getCurrentLocation(mapInstance) {
     if (!navigator.geolocation) {
-      alert('เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง');
+      alert(t('gps.notSupported'));
       return;
     }
 
@@ -127,7 +127,7 @@ function initMap() {
         ).addTo(mapInstance);
 
         window.userLocationMarker.bindPopup(`
-        <strong>📍 ตำแหน่งปัจจุบัน</strong><br>
+        <strong>📍 ${t('gps.title')}</strong><br>
         Latitude: ${latitude.toFixed(6)}<br>
         Longitude: ${longitude.toFixed(6)}<br>
         Accuracy: ±${Math.round(accuracy)} m
@@ -137,16 +137,16 @@ function initMap() {
         window.userLocationMarker.openPopup();
       },
       (error) => {
-        let message = 'ไม่สามารถระบุตำแหน่งได้';
+        let message = t('gps.errorGeneric');
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message = 'ไม่ได้รับอนุญาตให้เข้าถึงตำแหน่ง';
+            message = t('gps.errorDenied');
             break;
           case error.POSITION_UNAVAILABLE:
-            message = 'ไม่สามารถระบุตำแหน่งปัจจุบันได้';
+            message = t('gps.errorUnavailable');
             break;
           case error.TIMEOUT:
-            message = 'หมดเวลาในการค้นหาตำแหน่ง';
+            message = t('gps.errorTimeout');
             break;
         }
         alert(message);
@@ -383,12 +383,12 @@ function renderStationMarkers(stations) {
       interactive: true
     });
 
-    const levelText = formatNumber(s.waterlevel, 2, ' ม.รทก.');
+    const levelText = formatNumber(s.waterlevel, 2, ` ${t('unit.msl')}`);
     const percentText = formatNumber(s.storagePercent, 1, ' %');
-    const bankText = formatNumber(s.minBank, 2, ' ม.รทก.');
+    const bankText = formatNumber(s.minBank, 2, ` ${t('unit.msl')}`);
     const riverLine = s.riverName && s.riverName !== '-' ? `${t('popup.river')}: ${localizeName(s.riverName)}<br>` : '';
     const bankDiffLine = s.diffBankText && s.diffBankText !== '-'
-      ? `${s.diffBankText}: ${formatNumber(s.diffBank, 2, ' ม.')}<br>`
+      ? `${s.diffBankText}: ${formatNumber(s.diffBank, 2, ` ${t('unit.meter')}`)}<br>`
       : '';
 
     marker.bindPopup(`

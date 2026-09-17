@@ -56,6 +56,13 @@ const I18N = {
     'extremes.max': '🔴 ฝนมากสุด',
     'extremes.noData': 'ไม่พบข้อมูล',
     'unit.mm': 'มม.',
+    'unit.msl': 'ม.รทก.',
+    'unit.meter': 'ม.',
+    'gps.notSupported': 'เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง',
+    'gps.errorGeneric': 'ไม่สามารถระบุตำแหน่งได้',
+    'gps.errorDenied': 'ไม่ได้รับอนุญาตให้เข้าถึงตำแหน่ง',
+    'gps.errorUnavailable': 'ไม่สามารถระบุตำแหน่งปัจจุบันได้',
+    'gps.errorTimeout': 'หมดเวลาในการค้นหาตำแหน่ง',
 
     // Status bar (rain)
     'status.total': 'สถานีทั้งหมด',
@@ -219,6 +226,13 @@ const I18N = {
     'extremes.max': '🔴 Highest Rainfall',
     'extremes.noData': 'No data',
     'unit.mm': 'mm',
+    'unit.msl': 'MSL',
+    'unit.meter': 'm',
+    'gps.notSupported': 'This browser does not support geolocation',
+    'gps.errorGeneric': 'Unable to determine location',
+    'gps.errorDenied': 'Location access denied',
+    'gps.errorUnavailable': 'Current location unavailable',
+    'gps.errorTimeout': 'Location request timed out',
 
     'status.total': 'All Stations',
     'status.rain.normal': 'Light Rain',

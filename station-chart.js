@@ -377,7 +377,9 @@ function renderChart(result) {
               if (!raw) return items[0].label;
               const d = new Date(raw.replace(' ', 'T'));
               if (isNaN(d.getTime())) return items[0].label;
-              return d.toLocaleString('th-TH', { weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false });
+              return getLang() === 'en'
+                ? d.toLocaleString('en-US', { weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false })
+                : d.toLocaleString('th-TH', { weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false });
             },
             label: (item) => {
               // dataset ระบุหน่วยของตัวเองได้ (เช่น "%" ของเส้นความจุลำน้ำ) ต่างจากหน่วยหลักของกราฟ (unitSuffix)

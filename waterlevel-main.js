@@ -390,7 +390,7 @@ function renderTable() {
   tbody.innerHTML = rows
     .map((s) => {
       const status = classifyWaterlevelStatus(s.storagePercent) || 'unknown';
-      const levelText = !isNaN(s.waterlevel) ? `${s.waterlevel.toFixed(2)} <span class="muted">ม.</span>` : '-';
+      const levelText = !isNaN(s.waterlevel) ? `${s.waterlevel.toFixed(2)} <span class="muted">${t('unit.meter')}</span>` : '-';
       const percentText = !isNaN(s.storagePercent) ? `${s.storagePercent.toFixed(1)} <span class="muted">%</span>` : '-';
       return `
       <tr data-id="${s.id}" tabindex="0">
@@ -546,7 +546,7 @@ async function fetchStationWaterLevelChart(stationId, periodType, month, year, s
   if (bankLevel != null && !isNaN(bankLevel)) {
     datasets.push({
       type: 'line',
-      label: `${ridOverride ? t('chart.bankLevel') : t('chart.bankLevelMin')} ${bankLevel.toFixed(2)} ม.รทก.`,
+      label: `${ridOverride ? t('chart.bankLevel') : t('chart.bankLevelMin')} ${bankLevel.toFixed(2)} ${t('unit.msl')}`,
       data: values.map(() => bankLevel),
       borderColor: '#F87171', // แดง ตรงกับ --critical ในธีมเว็บ
       backgroundColor: '#F87171',
@@ -580,8 +580,8 @@ async function fetchStationWaterLevelChart(stationId, periodType, month, year, s
   }
 
   return {
-    unitLabel: `${t('chart.waterlevel')} (ม.รทก.)`,
-    unitSuffix: 'ม.รทก.',
+    unitLabel: `${t('chart.waterlevel')} (${t('unit.msl')})`,
+    unitSuffix: t('unit.msl'),
     y1Label: ridOverride ? t('chart.capacityPercent') : undefined,
     rawTimestamps,
     labels,

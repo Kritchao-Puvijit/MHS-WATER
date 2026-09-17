@@ -273,7 +273,7 @@ function initMap() {
   // ==========================================================
   function getCurrentLocation(mapInstance) {
     if (!navigator.geolocation) {
-      alert('เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง');
+      alert(t('gps.notSupported'));
       return;
     }
 
@@ -318,7 +318,7 @@ function initMap() {
 
         // Popup
         window.userLocationMarker.bindPopup(`
-        <strong>📍 ตำแหน่งปัจจุบัน</strong><br>
+        <strong>📍 ${t('gps.title')}</strong><br>
         Latitude: ${latitude.toFixed(6)}<br>
         Longitude: ${longitude.toFixed(6)}<br>
         Accuracy: ±${Math.round(accuracy)} m
@@ -334,19 +334,19 @@ function initMap() {
       },
 
       (error) => {
-        let message = 'ไม่สามารถระบุตำแหน่งได้';
+        let message = t('gps.errorGeneric');
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message = 'ไม่ได้รับอนุญาตให้เข้าถึงตำแหน่ง';
+            message = t('gps.errorDenied');
             break;
 
           case error.POSITION_UNAVAILABLE:
-            message = 'ไม่สามารถระบุตำแหน่งปัจจุบันได้';
+            message = t('gps.errorUnavailable');
             break;
 
           case error.TIMEOUT:
-            message = 'หมดเวลาในการค้นหาตำแหน่ง';
+            message = t('gps.errorTimeout');
             break;
         }
 
