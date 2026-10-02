@@ -7,7 +7,8 @@ console.log = function () { };
 
 // ฐาน API ของสสน. (Thaiwater v3) — เปลี่ยนจาก disaster.mhs-pao.go.th มาใช้แหล่งนี้แทน
 // เพราะบางสถานีของ API เดิมข้อมูลไม่อัพเดท
-const THAIWATER_BASE = 'https://api-v3.thaiwater.net/api/v1/thaiwater30';
+// const THAIWATER_BASE = 'https://api-v3.thaiwater.net/api/v1/thaiwater30';
+const THAIWATER_BASE = '/api/thaiwater';
 
 // ชุดข้อมูลย่อยแต่ละช่วงเวลา — endpoint และชื่อ field ค่าน้ำฝนอาจไม่เหมือนกันในแต่ละ endpoint
 // (เดาจากรูปแบบทั่วไปของ API สสน. ยังไม่ยืนยัน 100% — เช็ค console log แล้วแก้ valueKeys ให้ตรงได้)

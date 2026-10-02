@@ -5,7 +5,9 @@
 
 console.log = function () { };
 
-const THAIWATER_BASE = 'https://api-v3.thaiwater.net/api/v1/thaiwater30';
+// const THAIWATER_BASE = 'https://api-v3.thaiwater.net/api/v1/thaiwater30';
+const THAIWATER_BASE = '/api/thaiwater';
+
 const WATERLEVEL_PATH = '/public/waterlevel_load';
 // ดึงค่าระดับน้ำ
 const WATERLEVEL_VALUE_KEYS = ['waterlevel_m', 'waterlevel_msl', 'waterlevel_data', 'waterlevel', 'wl', 'value'];
